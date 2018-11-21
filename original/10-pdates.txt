@@ -1,0 +1,10 @@
+2018/11/07:1304786670,camera-camcorder-lens,Calgary
+2018/11/05:1385570526,camera-camcorder-lens,Edmonton
+2018/11/07:1275366783,camera-camcorder-lens,Calgary
+2018/11/07:1370676359,camera-camcorder-lens,Edmonton
+2018/11/07:1269098382,camera-camcorder-lens,Red-Deer
+2018/11/07:1396178670,camera-camcorder-lens,Calgary
+2018/11/04:1001612872,bed-mattress,Edmonton
+2018/11/07:1002787981,art-collectibles,Red-Deer
+2018/11/07:1003735318,art-collectibles,Edmonton
+2018/11/07:1003735660,art-collectibles,Edmonton

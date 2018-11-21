@@ -1,0 +1,10 @@
+8500:1304786670,camera-camcorder-lens,Calgary
+0:1385570526,camera-camcorder-lens,Edmonton
+240:1275366783,camera-camcorder-lens,Calgary
+525:1370676359,camera-camcorder-lens,Edmonton
+80:1269098382,camera-camcorder-lens,Red-Deer
+1600:1396178670,camera-camcorder-lens,Calgary
+130:1001612872,bed-mattress,Edmonton
+75:1002787981,art-collectibles,Red-Deer
+50:1003735318,art-collectibles,Edmonton
+50:1003735660,art-collectibles,Edmonton
