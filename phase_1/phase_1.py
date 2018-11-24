@@ -49,7 +49,6 @@ def write_prices(path):
                 if re.match("<ad>.*</ad>", line):
                     p = re.search("(<price>)(.*)(</price>)", line).group(2)
                     p = ' ' * (12 - len(p)) + p
-                    print(p)
                     a = re.search("(<aid>)(.*)(</aid>)", line).group(2)
                     c = re.search("(<cat>)(.*)(</cat>)", line).group(2)
                     l = re.search("(<loc>)(.*)(</loc>)", line).group(2)
