@@ -41,15 +41,14 @@ term = alphanumeric + "+"
 termSuffix = '%'
 termQuery = "(" + term + termSuffix + "|" + term + ")"
 expression = dateQuery + "|" + priceQuery + "|" + locationQuery + "|" + catQuery + "|" + termQuery
-query = "(\s*" + expression + ")*"
-
-
-
+# query = "(?:(" + expression + ")\s?)+"
 
 
 def main():
     testString = input()
-    print(re.search(query, testString))
+
+    for match in re.finditer(expression, testString):
+        print(match.group(0))
 
 
 if __name__ == "__main__":
