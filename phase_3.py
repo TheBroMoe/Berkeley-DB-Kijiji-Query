@@ -1,22 +1,22 @@
 '''
 alphanumeric    ::= [0-9a-zA-Z_-]
-numeric		::= [0-9]
+numeric		    ::= [0-9]
 date            ::= numeric numeric numeric numeric '/' numeric numeric '/' numeric numeric
 datePrefix      ::= 'date' whitespace* ('=' | '>' | '<' | '>=' | '<=')
 dateQuery       ::= datePrefix whitespace* date
-price		::= numeric+
+price	      	::= numeric+
 pricePrefix     ::= 'price' whitespace* ('=' | '>' | '<' | '>=' | '<=')
-priceQuery	::= pricePrefix whitespace* price
-location	::= alphanumeric+
+priceQuery  	::= pricePrefix whitespace* price
+location	    ::= alphanumeric+
 locationPrefix  ::= 'location' whitespace* '='
 locationQuery	::= locationPrefix whitespace* location
-cat		::= alphanumeric+
-catPrefix  	::= 'cat' whitespace* '='
-catQuery	::= catPrefix whitespace* cat
+cat	        	::= alphanumeric+
+catPrefix   	::= 'cat' whitespace* '='
+catQuery	    ::= catPrefix whitespace* cat
 term            ::= alphanumeric+
-termSuffix      ::= '%' 
+termSuffix      ::= '%'
 termQuery       ::= term | term termSuffix
-expression      ::= dateQuery | priceQuery | locationQuery | catQuery | termQuery 
+expression      ::= dateQuery | priceQuery | locationQuery | catQuery | termQuery
 query           ::= expression (whitespace expression)*
 
 '''
@@ -35,7 +35,7 @@ location = alphanumeric + '+'
 locationPrefix = 'location\s*='
 locationQuery = locationPrefix + '\s*' + location
 cat = alphanumeric + "+"
-catPrefix = 'cat\s\='
+catPrefix = 'cat\s*='
 catQuery = catPrefix + "\s*="
 term = alphanumeric + "+"
 termSuffix = '%'
@@ -48,7 +48,8 @@ query = expression + "(\s*" + expression + ")*"
 
 
 def main():
-    print('hello')
+    testString = input()
+    print(re.search(termQuery, testString))
 
 
 if __name__ == "__main__":
