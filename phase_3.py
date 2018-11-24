@@ -41,7 +41,7 @@ term = alphanumeric + "+"
 termSuffix = '%'
 termQuery = "(" + term + termSuffix + "|" + term + ")"
 expression = dateQuery + "|" + priceQuery + "|" + locationQuery + "|" + catQuery + "|" + termQuery
-query = "(\s*" + expression + ")*"
+query = expression + "(\s" + expression + ")*"
 
 
 
@@ -51,6 +51,7 @@ def main():
     testString = input()
     print(re.search(termQuery, testString))
 
+    
 
 if __name__ == "__main__":
     main()
