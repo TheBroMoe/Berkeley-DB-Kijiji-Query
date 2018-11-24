@@ -36,12 +36,12 @@ locationPrefix = 'location\s*='
 locationQuery = locationPrefix + '\s*' + location
 cat = alphanumeric + "+"
 catPrefix = 'cat\s*='
-catQuery = catPrefix + "\s*="
+catQuery = catPrefix + "\s*" + cat
 term = alphanumeric + "+"
 termSuffix = '%'
-termQuery = term + "|" + term + termSuffix
+termQuery = "(" + term + termSuffix + "|" + term + ")"
 expression = dateQuery + "|" + priceQuery + "|" + locationQuery + "|" + catQuery + "|" + termQuery
-query = expression + "(\s*" + expression + ")*"
+query = "(\s*" + expression + ")*"
 
 
 
