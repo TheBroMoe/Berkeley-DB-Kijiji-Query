@@ -51,9 +51,9 @@ def main():
     dbfile = "da.idx"
     database.open(dbfile, None, db.DB_UNKNOWN, db.DB_RDONLY)
     cur = database.cursor()
-    result = database.get(b'2018/11/07')
+    user = input("Enter stuff: ")
+    result = database.get(b+user)
     print(result)
-
     # iter = cur.next()
     # while iter:
     #     print(iter)
