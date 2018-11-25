@@ -57,8 +57,9 @@ def main():
     cur = database.cursor()
     user = input("Enter stuff: ")
     result = database.get(user.encode("utf-8"))
-    print(result)
+    print(result[1])
 
+    # print(str(result[0].decode("utf-8")), result[1], result[2])
 
     # if testString == 'output=full':
     #     briefOutput = False
