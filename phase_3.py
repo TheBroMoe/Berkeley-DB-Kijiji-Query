@@ -49,7 +49,7 @@ def main():
     testString = input()
     database = db.DB()
     dbfile = "ad.idx"
-    database.open(dbfile, None, db.DB_BTREE, db.DB_CREATE)
+    database.open(dbfile, None, db.DB_UNKNOWN, db.DB_RDONLY)
     cur = database.cursor()
 
     for match in re.finditer(expression, testString):
