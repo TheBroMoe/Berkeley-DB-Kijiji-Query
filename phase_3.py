@@ -51,11 +51,13 @@ def main():
     dbfile = "da.idx"
     database.open(dbfile, None, db.DB_UNKNOWN, db.DB_RDONLY)
     cur = database.cursor()
+    result = database.get(b'2018/11/07')
+    print(result)
 
-    iter = cur.next()
-    while iter:
-        print(iter)
-        iter = cur.next()
+    # iter = cur.next()
+    # while iter:
+    #     print(iter)
+    #     iter = cur.next()
     # for match in re.finditer(expression, testString):
     #     print(match.group(0))
 
