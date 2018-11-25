@@ -50,14 +50,21 @@ expression = dateQuery + "|" + priceQuery + "|" + locationQuery + "|" + catQuery
 
 def main():
 
-    testString = input()
+    # testString = input()
     database = db.DB()
     dbfile = "da.idx"
     database.open(dbfile, None, db.DB_UNKNOWN, db.DB_RDONLY)
     cur = database.cursor()
     user = input("Enter stuff: ")
+    for match in re.finditer(expression, user):
+        print(match.group(0))
+
     result = database.get(user.encode("utf-8"))
-    print(result)
+    result = str(result)
+    result = result[2:-1]
+    result = result.split(",")
+
+    print(result[0:])
 
 
     # if testString == 'output=full':

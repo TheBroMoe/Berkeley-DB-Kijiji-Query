@@ -1,9 +1,9 @@
 import re
 '''
 This file includes terms extracted from ad titles and descriptions; for our purpose, suppose a term is a consecutive sequence of alphanumeric,
-underscore '_' and dashed '-' characters, i.e [0-9a-zA-Z_-]. The format of the file is as follows: for every termT in the title or the 
-description of an ad with id a, there is a row in this file of the form t:a where t is the lowercase form of T. Ignore all special characters 
-coded as &#number; such as &#29987; which represents 産 as well as &apos;, &quot; and &amp; which respectively represent ', " and &. Also ignore terms 
+underscore '_' and dashed '-' characters, i.e [0-9a-zA-Z_-]. The format of the file is as follows: for every termT in the title or the
+description of an ad with id a, there is a row in this file of the form t:a where t is the lowercase form of T. Ignore all special characters
+coded as &#number; such as &#29987; which represents 産 as well as &apos;, &quot; and &amp; which respectively represent ', " and &. Also ignore terms
 of length 2 or less. Convert the terms to all lowercase before writing them out.
 '''
 def write_terms(path):
@@ -29,7 +29,7 @@ def write_terms(path):
                     term_desc = re.sub("&.*?;", "", term_desc)
                     term_desc = re.sub("[^0-9a-zA-Z-_]", " ", term_desc)
                     desc_terms = term_desc.split()
-                    
+
                     for term in desc_terms:
                         result = re.search("([0-9a-zA-Z-_]+)", term).group(1)
                         if result is not None and len(result) > 2:
@@ -53,7 +53,7 @@ def write_prices(path):
                     c = re.search("(<cat>)(.*)(</cat>)", line).group(2)
                     l = re.search("(<loc>)(.*)(</loc>)", line).group(2)
 
-                    fout.write("{}:{},{},{}\n".format(p,a,c,l))                    
+                    fout.write("{}:{},{},{}\n".format(p,a,c,l))
     print("written to " + path + '-prices.txt')
 
 '''
@@ -70,11 +70,11 @@ def write_pdates(path):
                     c = re.search("(<cat>)(.*)(</cat>)", line).group(2)
                     l = re.search("(<loc>)(.*)(</loc>)", line).group(2)
 
-                    fout.write("{}:{},{},{}\n".format(d,a,c,l))                    
+                    fout.write("{}:{},{},{}\n".format(d,a,c,l))
     print("written to " + path + '-pdates.txt')
 
 '''
-This file includes one line for each ad in the form of a:rec where a is the ad id and rec is the full ad record in xml. 
+This file includes one line for each ad in the form of a:rec where a is the ad id and rec is the full ad record in xml.
 '''
 def write_ads(path):
     # Read file
@@ -82,8 +82,8 @@ def write_ads(path):
         with open(path + '.txt', 'r') as fin:
             for line in fin:
                 if re.match("<ad>.*</ad>", line):
-                    a = re.search("(<aid>)(.*)(</aid>)", line).group(2)                    
-                    fout.write("{}:{}".format(a,line))                    
+                    a = re.search("(<aid>)(.*)(</aid>)", line).group(2)
+                    fout.write("{}:{}".format(a,line))
     print("written to " + path + '-pdates.txt')
 
 
@@ -98,7 +98,7 @@ def main():
     print("================")
 
 
-    
+
 
 if __name__ =='__main__':
     main()
