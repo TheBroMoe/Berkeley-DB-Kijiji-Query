@@ -20,6 +20,7 @@ expression      ::= dateQuery | priceQuery | locationQuery | catQuery | termQuer
 query           ::= expression (whitespace expression)*
 
 '''
+from bsddb3 import db
 
 import re
 
@@ -46,6 +47,10 @@ expression = dateQuery + "|" + priceQuery + "|" + locationQuery + "|" + catQuery
 
 def main():
     testString = input()
+    database = db.DB()
+    dbfile = "ad.idx"
+    database.open(dbfile, None, db.DB_BTREE, db.DB_CREATE)
+    cur = database.cursor()
 
     for match in re.finditer(expression, testString):
         print(match.group(0))
