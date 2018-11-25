@@ -23,6 +23,9 @@ query           ::= expression (whitespace expression)*
 from bsddb3 import db
 
 import re
+from bsddb3 import db
+briefOutput = True
+
 
 alphanumeric = "[0-9a-zA-Z_-]"
 numeric = "[0-9]"
@@ -46,7 +49,8 @@ expression = dateQuery + "|" + priceQuery + "|" + locationQuery + "|" + catQuery
 
 
 def main():
-    # testString = input()
+
+    testString = input()
     database = db.DB()
     dbfile = "da.idx"
     database.open(dbfile, None, db.DB_UNKNOWN, db.DB_RDONLY)
@@ -54,12 +58,27 @@ def main():
     user = input("Enter stuff: ")
     result = database.get(b+user)
     print(result)
+
+<<<<<<< HEAD
+    # if testString == 'output=full':
+    #     briefOutput = False
+    #
+    # exp = []  # all inputs by the user
+=======
     # iter = cur.next()
     # while iter:
     #     print(iter)
     #     iter = cur.next()
+>>>>>>> 23ff5f0390ba53800cc2c28c8eb5ca3bfc8f5710
     # for match in re.finditer(expression, testString):
-    #     print(match.group(0))
+    #     # print(match.group(0))
+    #     exp.append(match.group(0))
+    #
+    # iter = cur.first()
+    # while iter:
+    #     print(iter)
+    #     iter = cur.next()
+
 
 
 
