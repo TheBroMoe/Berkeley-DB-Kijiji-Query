@@ -64,7 +64,7 @@ def main():
     result = result[2:-1]
     result = result.split(",")
 
-    print(result[0:])
+    print("id: " + result[0] + " title: " + result[1])
 
 
     # if testString == 'output=full':
