@@ -56,19 +56,19 @@ def main():
     termdata = db.DB()
     addata = db.DB()
     dbfile = "da.idx"
-    datedata.open(dbfile, None, db.DB_UNKNOWN, db.DB_RDONLY)
+    datedata.open(dbfile, None, db.DB_BTREE, db.DB_RDONLY)
     dbfile = "pr.idx"
-    pricedata.open(dbfile, None, db.DB_UNKNOWN, db.DB_RDONLY)
+    pricedata.open(dbfile, None, db.DB_BTREE, db.DB_RDONLY)
     dbfile = "te.idx"
-    termdata.open(dbfile, None, db.DB_UNKNOWN, db.DB_RDONLY)
+    termdata.open(dbfile, None, db.DB_BTREE, db.DB_RDONLY)
     dbfile = "ad.idx"
-    addata.open(dbfile, None, db.DB_UNKNOWN, db.DB_RDONLY)
-    cur = database.cursor()
+    addata.open(dbfile, None, db.DB_HASH, db.DB_RDONLY)
+    cur = datedata.cursor()
     user = input("Enter stuff: ")
     for match in re.finditer(expression, user):
         print(match.group(1))
 
-    result = database.get(user.encode("utf-8"))
+    result = datedata.get(user.encode("utf-8"))
     result = str(result)
     result = result[2:-1]
     # print("result = " + result)
@@ -82,6 +82,8 @@ def main():
     #     exp.append(result[0:])
     print(exp)
 
+
+    search_equal(cur, termdata, None)
     # print(result[0:])
 
     # print(str(result[0].decode("utf-8")), result[1], result[2])
@@ -104,7 +106,18 @@ def main():
     #     print(iter)
     #     iter = cur.next()
 
+def search_equal(cursor, database, output_type):
+    # searched = set()
 
+    # key = database.firstkey()
+
+
+    for n in database.keys():
+        n = str(n)
+        n = n[2:-1]
+        print(n)
+
+    # return searced
 
 
 if __name__ == "__main__":
