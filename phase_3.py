@@ -46,14 +46,18 @@ expression = dateQuery + "|" + priceQuery + "|" + locationQuery + "|" + catQuery
 
 
 def main():
-    testString = input()
+    # testString = input()
     database = db.DB()
-    dbfile = "ad.idx"
+    dbfile = "da.idx"
     database.open(dbfile, None, db.DB_UNKNOWN, db.DB_RDONLY)
     cur = database.cursor()
 
-    for match in re.finditer(expression, testString):
-        print(match.group(0))
+    iter = cur.next()
+    while iter:
+        print(iter)
+        iter = cur.next()
+    # for match in re.finditer(expression, testString):
+    #     print(match.group(0))
 
 
 
