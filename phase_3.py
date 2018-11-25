@@ -58,10 +58,17 @@ def main():
     result = database.get(b'2018/11/07')
     print(result)
 
+<<<<<<< HEAD
     # if testString == 'output=full':
     #     briefOutput = False
     #
     # exp = []  # all inputs by the user
+=======
+    # iter = cur.next()
+    # while iter:
+    #     print(iter)
+    #     iter = cur.next()
+>>>>>>> 23ff5f0390ba53800cc2c28c8eb5ca3bfc8f5710
     # for match in re.finditer(expression, testString):
     #     # print(match.group(0))
     #     exp.append(match.group(0))
