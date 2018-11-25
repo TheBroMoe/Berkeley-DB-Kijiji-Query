@@ -23,7 +23,7 @@ query           ::= expression (whitespace expression)*
 from bsddb3 import db
 
 import re
-from bsddb3 import db
+
 briefOutput = True
 
 
@@ -51,13 +51,22 @@ expression = dateQuery + "|" + priceQuery + "|" + locationQuery + "|" + catQuery
 def main():
 
     # testString = input()
-    database = db.DB()
+    datedata = db.DB()
+    pricedata = db.DB()
+    termdata = db.DB()
+    addata = db.DB()
     dbfile = "da.idx"
-    database.open(dbfile, None, db.DB_UNKNOWN, db.DB_RDONLY)
+    datedata.open(dbfile, None, db.DB_UNKNOWN, db.DB_RDONLY)
+    dbfile = "pr.idx"
+    pricedata.open(dbfile, None, db.DB_UNKNOWN, db.DB_RDONLY)
+    dbfile = "te.idx"
+    termdata.open(dbfile, None, db.DB_UNKNOWN, db.DB_RDONLY)
+    dbfile = "ad.idx"
+    addata.open(dbfile, None, db.DB_UNKNOWN, db.DB_RDONLY)
     cur = database.cursor()
     user = input("Enter stuff: ")
     for match in re.finditer(expression, user):
-        print(match.group(0))
+        print(match.group(1))
 
     result = database.get(user.encode("utf-8"))
     result = str(result)
