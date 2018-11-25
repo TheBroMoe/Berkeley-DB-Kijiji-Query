@@ -30,7 +30,7 @@ briefOutput = True
 alphanumeric = "[0-9a-zA-Z_-]"
 numeric = "[0-9]"
 date = "(" + numeric * 4 + "/" + numeric * 2 + "/" + numeric * 2 + ")"
-datePrefix = "date\s*(=|>|<|>=|<=)"
+datePrefix = "(date)\s*(=|>|<|>=|<=)"
 dateQuery = datePrefix + "\s*" + date
 price = numeric + "+"
 pricePrefix = 'price\s*(=|>|<|>=|<=)'
@@ -51,29 +51,49 @@ expression = dateQuery + "|" + priceQuery + "|" + locationQuery + "|" + catQuery
 def main():
 
     # testString = input()
-    datedata = db.DB()
-    pricedata = db.DB()
-    termdata = db.DB()
-    addata = db.DB()
+    date_data = db.DB()
+    price_data = db.DB()
+    term_data = db.DB()
+    ad_data = db.DB()
     dbfile = "da.idx"
-    datedata.open(dbfile, None, db.DB_UNKNOWN, db.DB_RDONLY)
+    date_data.open(dbfile, None, db.DB_UNKNOWN, db.DB_RDONLY)
     dbfile = "pr.idx"
-    pricedata.open(dbfile, None, db.DB_UNKNOWN, db.DB_RDONLY)
+    price_data.open(dbfile, None, db.DB_UNKNOWN, db.DB_RDONLY)
     dbfile = "te.idx"
-    termdata.open(dbfile, None, db.DB_UNKNOWN, db.DB_RDONLY)
+    term_data.open(dbfile, None, db.DB_UNKNOWN, db.DB_RDONLY)
     dbfile = "ad.idx"
-    addata.open(dbfile, None, db.DB_UNKNOWN, db.DB_RDONLY)
-    cur = database.cursor()
+    ad_data.open(dbfile, None, db.DB_UNKNOWN, db.DB_RDONLY)
+    cur = date_data.cursor()
     user = input("Enter stuff: ")
+
+    date_pattern = re.compile(dateQuery)
+    price_pattern = re.compile(priceQuery)
+    location_pattern = re.compile(locationQuery)
+    cat_pattern = re.compile(catQuery)
+    term_pattern = re.compile(termQuery)
+
     for match in re.finditer(expression, user):
-        print(match.group(1))
+        match_expression = match.group(0)
+        if date_pattern.match(match_expression):
+            print("Date match: " + match_expression)
+        elif price_pattern.match(match_expression):
+            print("price match: " + match_expression)
+        elif location_pattern.match(match_expression):
+            print("location match: " + match_expression)
+        elif cat_pattern.match(match_expression):
+            print("category match: " + match_expression)
+        elif term_pattern.match(match_expression):
+            print("term match: " + match_expression)
+        print("=======")
 
-    result = database.get(user.encode("utf-8"))
+    result = date_data.get(user.encode("utf-8"))
     result = str(result)
-    result = result[2:-1]
-    result = result.split(",")
+    print(result)
 
-    print("id: " + result[0] + " title: " + result[1])
+    #result = result[2:-1]
+    #result = result.split(",")
+
+    #print("id: " + result[0] + " title: " + result[1])
 
 
     # if testString == 'output=full':
