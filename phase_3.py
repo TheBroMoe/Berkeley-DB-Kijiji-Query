@@ -31,7 +31,7 @@ alphanumeric = "[0-9a-zA-Z_-]"
 numeric = "[0-9]"
 date = "(" + numeric * 4 + "/" + numeric * 2 + "/" + numeric * 2 + ")"
 datePrefix = "(date)\s*(=|>|<|>=|<=)"
-dateQuery = datePrefix + "\s*" + date
+dateQuery = "(" + datePrefix + ")(\s*)(" + date + ")"
 price = numeric + "+"
 pricePrefix = 'price\s*(=|>|<|>=|<=)'
 priceQuery = pricePrefix + "\s*" + price
@@ -75,7 +75,9 @@ def main():
     for match in re.finditer(expression, user):
         match_expression = match.group(0)
         if date_pattern.match(match_expression):
-            print("Date match: " + match_expression)
+            given_date = re.search(dateQuery, match_expression).group(5)
+            giv_date = re.search(dateQuery, match_expression).group(3)
+            print(giv_date)
         elif price_pattern.match(match_expression):
             print("price match: " + match_expression)
         elif location_pattern.match(match_expression):
@@ -84,7 +86,7 @@ def main():
             print("category match: " + match_expression)
         elif term_pattern.match(match_expression):
             print("term match: " + match_expression)
-        print("=======")
+
 
     result = date_data.get(user.encode("utf-8"))
     result = str(result)
