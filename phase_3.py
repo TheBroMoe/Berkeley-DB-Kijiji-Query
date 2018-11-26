@@ -74,7 +74,7 @@ def main():
             if '=' in operator:
                 equalset = search_equal(date_data, given_date, 'exact')
             someset = someset.union(equalset)
-            print(len(someset))
+
 
         elif price_pattern.match(match_expression):
             given_price = int(re.search(priceQuery, match_expression).group(2))
@@ -88,7 +88,7 @@ def main():
             if '=' in operator:
                 equalset = search_equal_price(price_data, given_price)
             someset = someset.union(equalset)
-            print(len(someset))
+
 
         elif location_pattern.match(match_expression):
             given_loc = re.search(locationQuery, match_expression).group(3)
@@ -124,8 +124,6 @@ def main():
             first_exp = False
         else:
             result_set = result_set.intersection(someset)
-            if len(result_set) == 0:
-                print("No results")
 
     print_out(ad_data, result_set, brief_output)
 
