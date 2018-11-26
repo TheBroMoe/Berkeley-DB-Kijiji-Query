@@ -74,7 +74,7 @@ def main():
             if '=' in operator:
                 equalset = search_equal(date_data, given_date, 'exact')
             someset = someset.union(equalset)
-            print(len(someset))
+
 
 
         elif price_pattern.match(match_expression):
@@ -89,7 +89,7 @@ def main():
             if '=' in operator:
                 equalset = search_equal_price(price_data, given_price)
             someset = someset.union(equalset)
-            print(len(someset))
+
 
 
         elif location_pattern.match(match_expression):
@@ -114,8 +114,7 @@ def main():
             first_exp = False
         else:
             result_set = result_set.intersection(someset)
-            if len(result_set) == 0:
-                print("No results")
+
     print_out(ad_data, result_set, brief_output)
 
 def print_out(database, results, brief):
@@ -247,7 +246,7 @@ def search_loc_cat(database, keyword, type):
             if category.lower() == keyword:
                 res_set.add(k[0].decode("utf-8"))
         k = cursor.next()
-    print(len(res_set))
+
     return res_set
 #======================================================================================================#
 def search_equal(database, keyword, type):
