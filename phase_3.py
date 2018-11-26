@@ -1,6 +1,18 @@
+"""
+TODO LIST:
+* Add Comments to main function
+* Add Comments to helper functions
+* Add description for each function
+* Finish design pdf
+
+OPTIONAL TODOS:
+* Deal with edge cases
+"""
+
 from bsddb3 import db
 import re
 
+# GRAMMAR IMPLEMENTATION
 alphanumeric = "[0-9a-zA-Z._-]"
 numeric = "[0-9]"
 date = "(" + numeric * 4 + "/" + numeric * 2 + "/" + numeric * 2 + ")"
@@ -21,123 +33,130 @@ termQuery = "(" + term + termSuffix + "|" + term + ")"
 output = "(output)(\s*)(=)(\s*)(" + alphanumeric + "+)"
 expression = dateQuery + "|" + priceQuery + "|" + locationQuery + "|" + catQuery + "|" + output + "|" + termQuery
 
+# FUNCTIONS #
+#======================================================================================================#
+def search_loc_cat(database, keyword, type):
+    res_set = set()
+    cursor = database.cursor()
+    k = cursor.first()
+    while k:
+        if type == 'location':
+            location = re.search("(<loc>)(.*)(</loc>)", k[1].decode("utf-8")).group(2)
+            if location.lower() == keyword:
+                res_set.add(k[0].decode("utf-8"))
 
-def main():
-    brief_output = False
+        elif type == 'cat':
+            category = re.search("(<cat>)(.*)(</cat>)", k[1].decode("utf-8")).group(2)
+            if category.lower() == keyword:
+                res_set.add(k[0].decode("utf-8"))
+        k = cursor.next()
+    return res_set
 
-    date_data = db.DB()
-    price_data = db.DB()
-    term_data = db.DB()
-    ad_data = db.DB()
-    dbfile = "da.idx"
-    date_data.open(dbfile, None, db.DB_BTREE, db.DB_RDONLY)
-    dbfile = "pr.idx"
-    price_data.open(dbfile, None, db.DB_BTREE, db.DB_RDONLY)
-    dbfile = "te.idx"
-    term_data.open(dbfile, None, db.DB_BTREE, db.DB_RDONLY)
-    dbfile = "ad.idx"
-    ad_data.open(dbfile, None, db.DB_HASH, db.DB_RDONLY)
-    cur = date_data.cursor()
+#======================================================================================================#
+def less_than_price(database, keyword):
+    curs = database.cursor()
+    iter = curs.first()
+    res_set = set()
 
-    date_pattern = re.compile(dateQuery)
-    price_pattern = re.compile(priceQuery)
-    location_pattern = re.compile(locationQuery)
-    cat_pattern = re.compile(catQuery)
-    term_pattern = re.compile(termQuery)
-    output_pattern = re.compile(output)
+    while iter:
+        if int((iter[0].strip()).decode("utf-8")) != keyword:
+            result = iter[1].decode("utf-8").split(',')
+            result = result[0]
+            res_set.add(result)
+        else:
+            break
+        iter = curs.next()
+    return res_set
+#======================================================================================================#
 
-    while True:
-        print("=====================")
-        user = input("Enter stuff (ENTER QUIT TO EXIT): ")
+def less_than_date(database, keyword):
+    curs = database.cursor()
+    iter = curs.first()
+    res_set = set()
+    while iter:
+        if iter[0].decode("utf-8") != keyword:
+            result = iter[1].decode("utf-8").split(',')
+            result = result[0]
+            res_set.add(result)
+        else:
+            break
+        iter = curs.next()
+    return res_set
+#======================================================================================================#
+def greater_than_date(database, keyword):
 
-        if user == "QUIT":
-            print("Goodbye :)")
-            return
+    curs = database.cursor()
+    iter = curs.set_range(keyword.encode("utf-8"))
+    res_set = set()
+    while iter:
+        if iter[0].decode("utf-8") != keyword:
+            result = iter[1].decode("utf-8").split(',')
+            result = result[0]
+            res_set.add(result)
+        iter = curs.next()
 
-        user = user.lower()
+    return res_set
 
-        result_set = set()
+#======================================================================================================#
+def greater_than_price(database, keyword):
+    curs = database.cursor()
+    keyword += 1
+    iter = curs.set_range(((12-len(str(keyword))) * ' ' + str(keyword)).encode("utf-8"))
+    res_set = set()
+    while iter:
+        if int((iter[0].strip()).decode("utf-8")) != keyword:
+            result = iter[1].decode("utf-8").split(',')
+            result = result[0]
+            res_set.add(result)
+        else:
+            break
+        iter = curs.next()
+    return res_set
 
-        first_exp = True
+#======================================================================================================#
+def search_equal(database, keyword, type):
+    # database is the database to iterate over
+    # keyword is the key to look for in database
+    # type is a string: 'exact' or 'part'
+    searched = set()
+    cursor = database.cursor()
+    k = cursor.first()
 
-        for match in re.finditer(expression, user):
-            match_expression = match.group(0)
-            if output_pattern.match(match_expression):
-                option = re.search(output, match_expression).group(5)
-                if option == "full":
-                    brief_output = False
-                    print("brief_output is False")
-                    continue
-                elif option == "brief":
-                    brief_output = True
-                    print("brief_output is True")
-                    continue
-            elif date_pattern.match(match_expression):
-                given_date = re.search(dateQuery, match_expression).group(5)
-                operator = re.search(dateQuery, match_expression).group(3)
-                someset = set()
-                equalset = set()
-                if '<' in operator:
-                    someset = less_than_date(date_data, given_date)
-                if '>' in operator:
-                    someset = greater_than_date(date_data, given_date)
-                if '=' in operator:
-                    equalset = search_equal(date_data, given_date, 'exact')
-                someset = someset.union(equalset)
+    while k:
+        key = k[0].decode("utf-8")
+        value = k[1].decode("utf-8")
 
+        value = value.split(",")[0]
+        if type == 'exact':
+            if key == keyword:
+                searched.add(value)
+        elif type == 'part':
+            if key.startswith(keyword):
+                searched.add(value)
+        k = cursor.next()
 
-            elif price_pattern.match(match_expression):
-                given_price = int(re.search(priceQuery, match_expression).group(2))
-                operator = (re.search(priceQuery, match_expression).group(1))
-                someset = set()
-                equalset = set()
-                if '<' in operator:
-                    someset = less_than_price(price_data, given_price)
-                if '>' in operator:
-                    someset = greater_than_price(price_data, given_price)
-                if '=' in operator:
-                    equalset = search_equal_price(price_data, given_price)
-                someset = someset.union(equalset)
+    return searched
 
+#======================================================================================================#
+def search_equal_price(database, keyword):
+    # database is the database to iterate over
+    # keyword is the key to look for in database
+    searched = set()
+    cursor = database.cursor()
+    k = cursor.set(((12-len(str(keyword))) * ' ' + str(keyword)).encode("utf-8"))
 
-            elif location_pattern.match(match_expression):
-                given_loc = re.search(locationQuery, match_expression).group(3)
-                someset = search_loc_cat(ad_data, given_loc, 'location')
+    while k:
+        key = k[0].decode("utf-8").strip()
 
-            elif cat_pattern.match(match_expression):
-                given_cat = re.search(catQuery, match_expression).group(3)
-                someset = search_loc_cat(ad_data, given_cat, 'cat')
+        value = k[1].decode("utf-8")
+        value = value.split(",")[0]
+        if int(key) == keyword:
+            searched.add(value)
+        k = cursor.next()
 
-            elif output_pattern.match(match_expression):
-                option = re.search(output, match_expression).group(5)
-                if option == "full":
-                    brief_output = False
-                    print("brief_output is False")
-                elif option == "brief":
-                    brief_output = True
-                    print("brief_output is True")
+    return searched
 
-            elif term_pattern.match(match_expression):
-                given_term = re.search(termQuery, match_expression).group(0)
-                type = "part" if given_term[-1] == "%" else "exact"
-                if given_term[-1] == "%":
-                    given_term = given_term[:-1]
-                someset = search_equal(term_data,given_term, type)
-
-            else:
-                print("Invalid input")
-
-
-            print(first_exp)
-            if first_exp == True:
-                result_set = someset
-                first_exp = False
-            else:
-                result_set = result_set.intersection(someset)
-
-        print_out(ad_data, result_set, brief_output)
-
-
+#======================================================================================================#
 def print_out(database, results, brief):
     curs = database.cursor()
     if brief:
@@ -192,124 +211,111 @@ def print_out(database, results, brief):
     print("-----------------")
     print("Total Results: " + str(len(results)))
 
+# MAIN #
 
-#======================================================================================================#
-def less_than_price(database, keyword):
-    curs = database.cursor()
-    iter = curs.first()
-    res_set = set()
+def main():
+    brief_output = False
 
-    while iter:
-        if int((iter[0].strip()).decode("utf-8")) != keyword:
-            result = iter[1].decode("utf-8").split(',')
-            result = result[0]
-            res_set.add(result)
-        else:
-            break
-        iter = curs.next()
-    return res_set
-#======================================================================================================
+    date_data = db.DB()
+    price_data = db.DB()
+    term_data = db.DB()
+    ad_data = db.DB()
+    dbfile = "da.idx"
+    date_data.open(dbfile, None, db.DB_BTREE, db.DB_RDONLY)
+    dbfile = "pr.idx"
+    price_data.open(dbfile, None, db.DB_BTREE, db.DB_RDONLY)
+    dbfile = "te.idx"
+    term_data.open(dbfile, None, db.DB_BTREE, db.DB_RDONLY)
+    dbfile = "ad.idx"
+    ad_data.open(dbfile, None, db.DB_HASH, db.DB_RDONLY)
+    cur = date_data.cursor()
 
-def less_than_date(database, keyword):
-    curs = database.cursor()
-    iter = curs.first()
-    res_set = set()
-    while iter:
-        if iter[0].decode("utf-8") != keyword:
-            result = iter[1].decode("utf-8").split(',')
-            result = result[0]
-            res_set.add(result)
-        else:
-            break
-        iter = curs.next()
-    return res_set
-#======================================================================================================
-def greater_than_date(database, keyword):
+    date_pattern = re.compile(dateQuery)
+    price_pattern = re.compile(priceQuery)
+    location_pattern = re.compile(locationQuery)
+    cat_pattern = re.compile(catQuery)
+    term_pattern = re.compile(termQuery)
+    output_pattern = re.compile(output)
 
-    curs = database.cursor()
-    iter = curs.set_range(keyword.encode("utf-8"))
-    res_set = set()
-    while iter:
-        if iter[0].decode("utf-8") != keyword:
-            result = iter[1].decode("utf-8").split(',')
-            result = result[0]
-            res_set.add(result)
-        iter = curs.next()
+    while True:
+        print("=====================")
+        user = input("Enter Query ('QUIT' To Exit): ")
 
-    return res_set
-#======================================================================================================
-def greater_than_price(database, keyword):
-    curs = database.cursor()
-    keyword += 1
-    iter = curs.set_range(((12-len(str(keyword))) * ' ' + str(keyword)).encode("utf-8"))
-    res_set = set()
-    while iter:
-        if int((iter[0].strip()).decode("utf-8")) != keyword:
-            result = iter[1].decode("utf-8").split(',')
-            result = result[0]
-            res_set.add(result)
-        else:
-            break
-        iter = curs.next()
-    return res_set
-#======================================================================================================
-def search_loc_cat(database, keyword, type):
-    res_set = set()
-    cursor = database.cursor()
-    k = cursor.first()
-    while k:
-        if type == 'location':
-            location = re.search("(<loc>)(.*)(</loc>)", k[1].decode("utf-8")).group(2)
-            if location.lower() == keyword:
-                res_set.add(k[0].decode("utf-8"))
+        if user == "QUIT":
+            print("Goodbye :)")
+            return
 
-        elif type == 'cat':
-            category = re.search("(<cat>)(.*)(</cat>)", k[1].decode("utf-8")).group(2)
-            if category.lower() == keyword:
-                res_set.add(k[0].decode("utf-8"))
-        k = cursor.next()
-    return res_set
-#======================================================================================================#
-def search_equal(database, keyword, type):
-    # database is the database to iterate over
-    # keyword is the key to look for in database
-    # type is a string: 'exact' or 'part'
-    searched = set()
-    cursor = database.cursor()
-    k = cursor.first()
+        user = user.lower()
 
-    while k:
-        key = k[0].decode("utf-8")
-        value = k[1].decode("utf-8")
+        result_set = set()
 
-        value = value.split(",")[0]
-        if type == 'exact':
-            if key == keyword:
-                searched.add(value)
-        elif type == 'part':
-            if key.startswith(keyword):
-                searched.add(value)
-        k = cursor.next()
+        first_exp = True
 
-    return searched
-#======================================================================================================#
-def search_equal_price(database, keyword):
-    # database is the database to iterate over
-    # keyword is the key to look for in database
-    searched = set()
-    cursor = database.cursor()
-    k = cursor.set(((12-len(str(keyword))) * ' ' + str(keyword)).encode("utf-8"))
+        for match in re.finditer(expression, user):
+            match_expression = match.group(0)
+            if output_pattern.match(match_expression):
+                option = re.search(output, match_expression).group(5)
+                if option == "full":
+                    brief_output = False
+                    continue
+                elif option == "brief":
+                    brief_output = True
+                    continue
+            elif date_pattern.match(match_expression):
+                given_date = re.search(dateQuery, match_expression).group(5)
+                operator = re.search(dateQuery, match_expression).group(3)
+                someset = set()
+                equalset = set()
+                if '<' in operator:
+                    someset = less_than_date(date_data, given_date)
+                if '>' in operator:
+                    someset = greater_than_date(date_data, given_date)
+                if '=' in operator:
+                    equalset = search_equal(date_data, given_date, 'exact')
+                someset = someset.union(equalset)
 
-    while k:
-        key = k[0].decode("utf-8").strip()
 
-        value = k[1].decode("utf-8")
-        value = value.split(",")[0]
-        if int(key) == keyword:
-            searched.add(value)
-        k = cursor.next()
+            elif price_pattern.match(match_expression):
+                given_price = int(re.search(priceQuery, match_expression).group(2))
+                operator = (re.search(priceQuery, match_expression).group(1))
+                someset = set()
+                equalset = set()
+                if '<' in operator:
+                    someset = less_than_price(price_data, given_price)
+                if '>' in operator:
+                    someset = greater_than_price(price_data, given_price)
+                if '=' in operator:
+                    equalset = search_equal_price(price_data, given_price)
+                someset = someset.union(equalset)
 
-    return searched
+
+            elif location_pattern.match(match_expression):
+                given_loc = re.search(locationQuery, match_expression).group(3)
+                someset = search_loc_cat(ad_data, given_loc, 'location')
+
+            elif cat_pattern.match(match_expression):
+                given_cat = re.search(catQuery, match_expression).group(3)
+                someset = search_loc_cat(ad_data, given_cat, 'cat')
+
+            elif term_pattern.match(match_expression):
+                given_term = re.search(termQuery, match_expression).group(0)
+                type = "part" if given_term[-1] == "%" else "exact"
+                if given_term[-1] == "%":
+                    given_term = given_term[:-1]
+                someset = search_equal(term_data,given_term, type)
+
+            else:
+                print("Invalid input")
+
+
+            if first_exp == True:
+                result_set = someset
+                first_exp = False
+            else:
+                result_set = result_set.intersection(someset)
+
+        print_out(ad_data, result_set, brief_output)
+
 
 if __name__ == "__main__":
     main()
