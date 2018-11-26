@@ -117,6 +117,7 @@ def main():
         else:
             print("Invalid input")
 
+
         print(first_exp)
         if first_exp == True:
             result_set = someset
@@ -125,7 +126,6 @@ def main():
             result_set = result_set.intersection(someset)
             if len(result_set) == 0:
                 print("No results")
-    print_out(ad_data, result_set, brief_output)
 
     print_out(ad_data, result_set, brief_output)
 
@@ -260,7 +260,6 @@ def search_loc_cat(database, keyword, type):
             if category.lower() == keyword:
                 res_set.add(k[0].decode("utf-8"))
         k = cursor.next()
-    print(len(res_set))
     return res_set
 #======================================================================================================#
 def search_equal(database, keyword, type):
