@@ -25,7 +25,7 @@ from bsddb3 import db
 import re
 
 
-alphanumeric = "[0-9a-zA-Z_-]"
+alphanumeric = "[0-9a-zA-Z._-]"
 numeric = "[0-9]"
 date = "(" + numeric * 4 + "/" + numeric * 2 + "/" + numeric * 2 + ")"
 datePrefix = "(date)\s*(=|>|<|>=|<=)"
@@ -35,10 +35,10 @@ pricePrefix = 'price\s*(=|>|<|>=|<=)'
 priceQuery = pricePrefix + "\s*" + "(" + price + ")"
 location = alphanumeric + '+'
 locationPrefix = 'location\s*='
-locationQuery = locationPrefix + '\s*' + location
+locationQuery = "(" + locationPrefix + ')(\s*)(' + location + ")"
 cat = alphanumeric + "+"
 catPrefix = 'cat\s*='
-catQuery = catPrefix + "\s*" + cat
+catQuery = "(" + catPrefix + ")(\s*)(" + cat + ")"
 term = alphanumeric + "+"
 termSuffix = '%'
 termQuery = "(" + term + termSuffix + "|" + term + ")"
@@ -108,9 +108,11 @@ def main():
 
 
         elif location_pattern.match(match_expression):
-            print("location match: " + match_expression)
+            given_loc = re.search(locationQuery, match_expression).group(3)
+            search_loc_cat(ad_data, given_loc, 'location')
         elif cat_pattern.match(match_expression):
-            print("category match: " + match_expression)
+            given_cat = re.search(catQuery, match_expression).group(3)
+            search_loc_cat(ad_data, given_cat, 'cat')
         elif output_pattern.match(match_expression):
             option = re.search(output, match_expression).group(5)
             if option == "full":
@@ -278,18 +280,15 @@ def search_loc_cat(database, keyword, type):
     while k:
         if type == 'location':
             location = re.search("(<loc>)(.*)(</loc>)", k[1].decode("utf-8")).group(2)
-            print(location)
             if location.lower() == keyword:
                 res_set.add(k[0].decode("utf-8"))
 
         elif type == 'cat':
             category = re.search("(<cat>)(.*)(</cat>)", k[1].decode("utf-8")).group(2)
-            print(category)
             if category.lower() == keyword:
                 res_set.add(k[0].decode("utf-8"))
         k = cursor.next()
-        print()
-    print(res_set)
+    print(len(res_set))
     return res_set
 #======================================================================================================#
 def search_equal(database, keyword, type):
