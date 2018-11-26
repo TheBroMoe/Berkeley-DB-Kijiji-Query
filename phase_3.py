@@ -63,7 +63,7 @@ def main():
     dbfile = "ad.idx"
     ad_data.open(dbfile, None, db.DB_HASH, db.DB_RDONLY)
     cur = date_data.cursor()
-    user = input("Enter stuff: ")
+    user = input("Enter stuff: ").lower()
 
     date_pattern = re.compile(dateQuery)
     price_pattern = re.compile(priceQuery)
@@ -80,7 +80,16 @@ def main():
         if date_pattern.match(match_expression):
             given_date = re.search(dateQuery, match_expression).group(5)
             operator = re.search(dateQuery, match_expression).group(3)
-            #given_date = operator + given_date
+            someset = set()
+            equalset = set()
+            if '<' in operator:
+                someset = less_then_date(date_data, given_date)
+            if '>' in operator:
+                someset = greater_than_date(date_data, given_date)
+            if '=' in operator:
+                equalset = search_equal(date_data, given_date, 'exact')
+            someset.union(equalset)
+            print(len(someset))
         elif price_pattern.match(match_expression):
             given_price = int(re.search(priceQuery, match_expression).group(2))
 
@@ -113,7 +122,19 @@ def main():
         #         print("No results")
         #         break;
 
-        # print_out(ad_data, result_set, brief_output)
+    #new_set = search_loc_cat(ad_data, user, 'cat')
+    # new_set = search_equal(term_data, user, 'part')
+
+def greater_than(database, keyword, output_type):
+
+        if first_exp == True:
+            result_set = new_set
+            first_exp = False
+        else:
+            result_set.intersection(new_set)
+            if len(result_set) == 0:
+                print("No results")
+
 
         #result_set.intersection(new_set)
 
@@ -141,8 +162,9 @@ def less_than_price(database, keyword, output_type):
             break
         iter = curs.next()
     return res_set
-#======================================================================================================#
-def less_than_date(database, keyword, output_type):
+#======================================================================================================
+
+def less_than_date(database, keyword):
     curs = database.cursor()
     iter = curs.first()
     res_set = set()
@@ -155,8 +177,8 @@ def less_than_date(database, keyword, output_type):
             break
         iter = curs.next()
     return res_set
-#======================================================================================================#
-def greater_than_date(database, keyword, output_type):
+#======================================================================================================
+def greater_than_date(database, keyword):
 
     curs = database.cursor()
     iter = curs.set_range(keyword.encode("utf-8"))
@@ -169,22 +191,22 @@ def greater_than_date(database, keyword, output_type):
         iter = curs.next()
 
     return res_set
-#======================================================================================================#
-def greater_than_price(database, keyword, output_type):
+#======================================================================================================
+def greater_than_price(database, keyword):
     curs = database.cursor()
     keyword += 1
     iter = curs.set_range(((12-len(str(keyword))) * ' ' + str(keyword)).encode("utf-8"))
     res_set = set()
     while iter:
         if int((iter[0].strip()).decode("utf-8")) != keyword:
-            print(iter)
             result = iter[1].decode("utf-8").split(',')
             result = result[0]
             res_set.add(result)
         else:
             break
         iter = curs.next()
-#======================================================================================================#
+    return res_set
+#======================================================================================================
 def search_loc_cat(database, keyword, type):
     res_set = set()
     keyword = keyword.lower()
