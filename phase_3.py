@@ -56,14 +56,14 @@ def main():
     term_data = db.DB()
     ad_data = db.DB()
     dbfile = "da.idx"
-    datedata.open(dbfile, None, db.DB_BTREE, db.DB_RDONLY)
+    date_data.open(dbfile, None, db.DB_BTREE, db.DB_RDONLY)
     dbfile = "pr.idx"
-    pricedata.open(dbfile, None, db.DB_BTREE, db.DB_RDONLY)
+    price_data.open(dbfile, None, db.DB_BTREE, db.DB_RDONLY)
     dbfile = "te.idx"
-    termdata.open(dbfile, None, db.DB_BTREE, db.DB_RDONLY)
+    term_data.open(dbfile, None, db.DB_BTREE, db.DB_RDONLY)
     dbfile = "ad.idx"
-    addata.open(dbfile, None, db.DB_HASH, db.DB_RDONLY)
-    cur = datedata.cursor()
+    ad_data.open(dbfile, None, db.DB_HASH, db.DB_RDONLY)
+    cur = date_data.cursor()
     user = input("Enter stuff: ")
 
     date_pattern = re.compile(dateQuery)
@@ -95,7 +95,7 @@ def main():
 
     #print("id: " + result[0] + " title: " + result[1])
 
-    search_equal(cur, termdata, None)
+    search_equal(date_data, user, None)
     # print(result[0:])
 
     # print(str(result[0].decode("utf-8")), result[1], result[2])
@@ -118,16 +118,22 @@ def main():
     #     print(iter)
     #     iter = cur.next()
 
-def search_equal(cursor, database, output_type):
+def search_equal(database, keyword, output_type):
     # searched = set()
+    print("***************************************")
 
-    # key = database.firstkey()
+    cursor = database.cursor()
+    key = cursor.first()
+    while key:
+        # key = str(key)[2:-1]
+        print(key.key())
+        key = cursor.next()
 
 
-    for n in database.keys():
-        n = str(n)
-        n = n[2:-1]
-        print(n)
+    # for n in database.keys():
+    #     n = str(n)
+    #     n = n[2:-1]
+    #     print(n)
 
     # return searced
 
