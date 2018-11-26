@@ -94,78 +94,21 @@ def main():
         else:
             print("Invalid input")
 
-<<<<<<< HEAD
-        if first_exp == True:
-            result_set = new_set
-            first_exp = False
-        else:
-            result_set.intersection(new_set)
-            if len(result_set) == 0:
-                print("No results")
-                break;
-=======
-        #result_set.intersection(new_set)
->>>>>>> 3cb4d5c6394a544632b79022af927354ee74981c
+        # if first_exp == True:
+        #     result_set = new_set
+        #     first_exp = False
+        # else:
+        #     result_set.intersection(new_set)
+        #     if len(result_set) == 0:
+        #         print("No results")
+        #         break;
 
-    new_set = search_equal(term_data, user, 'part')
+    new_set = search_loc_cat(ad_data, user, 'cat')
+    # new_set = search_equal(term_data, user, 'part')
 
     # greater_than(date_data, given_date, None)
 
-<<<<<<< HEAD
 def greater_than(database, keyword, output_type):
-=======
-    # result = date_data.get(user.encode("utf-8"))
-    # result = str(result)
-    # print(result)
-    # print(given_date)
-    #result = result[2:-1]
-    #result = result.split(",")
-    # greater_than_equal(date_data, given_date, None)
-    #print("id: " + result[0] + " title: " + result[1])
-
-    # greater_than_date(date_data, given_date, None)
-    testset = less_than_date(date_data, given_date, None)
-    #search_equal(term_data, user)
-    print(len(testset))
-    # print(result[0:])
-
-    # print(str(result[0].decode("utf-8")), result[1], result[2])
-
-    # if testString == 'output=full':
-    #     briefOutput = False
-    #
-    # exp = []  # all inputs by the user
-
-    # iter = cur.next()
-    # while iter:
-    #     print(iter)
-    #     iter = cur.next()
-    # for match in re.finditer(expression, user):
-    #     print(match.group(0))
-    #     exp.append(match.group(0))
-    #
-    # iter = cur.first()
-    # while iter:
-    #     print(iter)
-    #     iter = cur.next()
-def less_than_price():
-    pass
-def less_than_date(database, keyword, output_type):
-    curs = database.cursor()
-    iter = curs.first()
-    res_set = set()
-    while iter:
-        if iter[0].decode("utf-8") != keyword:
-            result = iter[1].decode("utf-8").split(',')
-            result = result[0]
-            res_set.add(result)
-        else:
-            break
-        iter = curs.next()
-    return res_set
-
-def greater_than_date(database, keyword, output_type):
->>>>>>> 3cb4d5c6394a544632b79022af927354ee74981c
     curs = database.cursor()
     iter = curs.set_range(keyword.encode("utf-8"))
     res_set = set()
@@ -177,6 +120,7 @@ def greater_than_date(database, keyword, output_type):
         iter = curs.next()
 
     return res_set
+
 def greater_than_price(database, keyword, output_type):
     curs = database.cursor()
     keyword += 1
@@ -186,42 +130,50 @@ def greater_than_price(database, keyword, output_type):
         print(iter[0].strip())
         iter = curs.next()
 
+def search_loc_cat(database, keyword, type):
+    res_set = set()
+    keyword = keyword.lower()
+    cursor = database.cursor()
+    k = cursor.first()
+    while k:
+        if type == 'location':
+            location = re.search("(<loc>)(.*)(</loc>)", k[1].decode("utf-8")).group(2)
+            print(location)
+            if location.lower() == keyword:
+                res_set.add(k[0].decode("utf-8"))
+
+        elif type == 'cat':
+            category = re.search("(<cat>)(.*)(</cat>)", k[1].decode("utf-8")).group(2)
+            print(category)
+            if category.lower() == keyword:
+                res_set.add(k[0].decode("utf-8"))
+        k = cursor.next()
+        print()
+    print(res_set)
+    return res_set
+
+
 def search_equal(database, keyword, type):
     # database is the database to iterate over
     # keyword is the key to look for in database
     # type is a string: 'exact' or 'part'
     searched = set()
-    print("***************************************")
-
-    print(keyword)
     keyword = keyword.lower()
     cursor = database.cursor()
     k = cursor.first()
 
-    if type == 'exact':
-        while k:
-            # print(k) #test
-            key = str(k[0])
-            key = key[2:-1]
-            value = str(k[1])
-            value = value.split(",")[0][2:-1]
+    while k:
+        key = str(k[0])
+        key = key[2:-1]
+        value = str(k[1])
+        value = value.split(",")[0][2:-1]
+        if type == 'exact':
             if key == keyword.lower():
                 searched.add(value)
-            k = cursor.next()
-
-    elif type == 'part':
-        keyword = keyword[:-1]
-        while k:
-            print(k) #test
-            key = str(k[0])
-            key = key[2:-1]
-            print(key)
-            value = str(k[1])
-            value = value.split(",")[0][2:-1]
-            print(keyword)
+        elif type == 'part':
             if key.startswith(keyword):
                 searched.add(value)
-            k = cursor.next()
+        k = cursor.next()
 
     if len(searched) == 0:
         print("No elements in searched set")
