@@ -52,7 +52,17 @@ def main():
 
     for match in re.finditer(expression, user):
         match_expression = match.group(0)
-        if date_pattern.match(match_expression):
+        if output_pattern.match(match_expression):
+            option = re.search(output, match_expression).group(5)
+            if option == "full":
+                brief_output = False
+                print("brief_output is False")
+                continue
+            elif option == "brief":
+                brief_output = True
+                print("brief_output is True")
+                continue
+        elif date_pattern.match(match_expression):
             given_date = re.search(dateQuery, match_expression).group(5)
             operator = re.search(dateQuery, match_expression).group(3)
             someset = set()
@@ -65,7 +75,6 @@ def main():
                 equalset = search_equal(date_data, given_date, 'exact')
             someset = someset.union(equalset)
             print(len(someset))
-            print_out(ad_data, someset, brief_output)
 
 
         elif price_pattern.match(match_expression):
@@ -89,14 +98,7 @@ def main():
         elif cat_pattern.match(match_expression):
             given_cat = re.search(catQuery, match_expression).group(3)
             someset = search_loc_cat(ad_data, given_cat, 'cat')
-        elif output_pattern.match(match_expression):
-            option = re.search(output, match_expression).group(5)
-            if option == "full":
-                brief_output = False
-                print("brief_output is False")
-            elif option == "brief":
-                brief_output = True
-                print("brief_output is True")
+
         elif term_pattern.match(match_expression):
             given_term = re.search(termQuery, match_expression).group(0)
             type = "part" if given_term[-1] == "%" else "exact"
@@ -111,9 +113,10 @@ def main():
             result_set = someset
             first_exp = False
         else:
-            result_set.intersection(someset)
+            result_set = result_set.intersection(someset)
             if len(result_set) == 0:
                 print("No results")
+    print_out(ad_data, result_set, brief_output)
 
 def print_out(database, results, brief):
     curs = database.cursor()
@@ -165,6 +168,9 @@ def print_out(database, results, brief):
 
             price = re.search("(<price>)(.*)(</price>)", iteration).group(2)
             print("Price: {}".format(price))
+
+        print("-----------------")
+        print("Total results: ", len(results))
 
 #======================================================================================================#
 def less_than_price(database, keyword):
