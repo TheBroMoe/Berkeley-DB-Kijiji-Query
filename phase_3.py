@@ -52,7 +52,17 @@ def main():
 
     for match in re.finditer(expression, user):
         match_expression = match.group(0)
-        if date_pattern.match(match_expression):
+        if output_pattern.match(match_expression):
+            option = re.search(output, match_expression).group(5)
+            if option == "full":
+                brief_output = False
+                print("brief_output is False")
+                continue
+            elif option == "brief":
+                brief_output = True
+                print("brief_output is True")
+                continue
+        elif date_pattern.match(match_expression):
             given_date = re.search(dateQuery, match_expression).group(5)
             operator = re.search(dateQuery, match_expression).group(3)
             someset = set()
@@ -115,6 +125,7 @@ def main():
             result_set = result_set.intersection(someset)
             if len(result_set) == 0:
                 print("No results")
+    print_out(ad_data, result_set, brief_output)
 
     print_out(ad_data, result_set, brief_output)
 
