@@ -74,10 +74,12 @@ def main():
 
     result_set = set()
 
+    first_exp = True
+
     for match in re.finditer(expression, user):
         match_expression = match.group(0)
         if date_pattern.match(match_expression):
-            given_date = re.search(dateQuery, match_expression).group(5)
+            # given_date = re.search(dateQuery, match_expression).group(5)
             operator = re.search(dateQuery, match_expression).group(3)
             #given_date = operator + given_date
         elif price_pattern.match(match_expression):
@@ -92,11 +94,26 @@ def main():
         else:
             print("Invalid input")
 
+<<<<<<< HEAD
+        if first_exp == True:
+            result_set = new_set
+            first_exp = False
+        else:
+            result_set.intersection(new_set)
+            if len(result_set) == 0:
+                print("No results")
+                break;
+=======
         #result_set.intersection(new_set)
+>>>>>>> 3cb4d5c6394a544632b79022af927354ee74981c
 
     new_set = search_equal(term_data, user, 'part')
 
+    # greater_than(date_data, given_date, None)
 
+<<<<<<< HEAD
+def greater_than(database, keyword, output_type):
+=======
     # result = date_data.get(user.encode("utf-8"))
     # result = str(result)
     # print(result)
@@ -161,6 +178,7 @@ def less_than_date(database, keyword, output_type):
     return res_set
 
 def greater_than_date(database, keyword, output_type):
+>>>>>>> 3cb4d5c6394a544632b79022af927354ee74981c
     curs = database.cursor()
     iter = curs.set_range(keyword.encode("utf-8"))
     res_set = set()
@@ -205,14 +223,15 @@ def search_equal(database, keyword, type):
             k = cursor.next()
 
     elif type == 'part':
+        keyword = keyword[:-1]
         while k:
-            # print(k) #test
+            print(k) #test
             key = str(k[0])
             key = key[2:-1]
-            # print(key)
+            print(key)
             value = str(k[1])
             value = value.split(",")[0][2:-1]
-            # print(keyword)
+            print(keyword)
             if key.startswith(keyword):
                 searched.add(value)
             k = cursor.next()
