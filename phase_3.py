@@ -94,7 +94,7 @@ def main():
         else:
             print("Invalid input")
 
-<<<<<<< HEAD
+
         if first_exp == True:
             result_set = new_set
             first_exp = False
@@ -103,17 +103,14 @@ def main():
             if len(result_set) == 0:
                 print("No results")
                 break;
-=======
+
         #result_set.intersection(new_set)
->>>>>>> 3cb4d5c6394a544632b79022af927354ee74981c
+
 
     new_set = search_equal(term_data, user, 'part')
 
     # greater_than(date_data, given_date, None)
 
-<<<<<<< HEAD
-def greater_than(database, keyword, output_type):
-=======
     # result = date_data.get(user.encode("utf-8"))
     # result = str(result)
     # print(result)
@@ -178,7 +175,7 @@ def less_than_date(database, keyword, output_type):
     return res_set
 
 def greater_than_date(database, keyword, output_type):
->>>>>>> 3cb4d5c6394a544632b79022af927354ee74981c
+
     curs = database.cursor()
     iter = curs.set_range(keyword.encode("utf-8"))
     res_set = set()
