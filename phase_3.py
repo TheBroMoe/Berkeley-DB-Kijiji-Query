@@ -107,11 +107,11 @@ def main():
     #print("id: " + result[0] + " title: " + result[1])
 
     # greater_than_date(date_data, given_date, None)
-    testset = less_than_date(date_data, given_date, None)
+    #testset = less_than_date(date_data, given_date, None)
     #search_equal(term_data, user)
-    print(len(testset))
+    #print(len(testset))
     # print(result[0:])
-
+    less_than_price(price_data, given_price, None)
     # print(str(result[0].decode("utf-8")), result[1], result[2])
 
     # if testString == 'output=full':
@@ -131,8 +131,21 @@ def main():
     # while iter:
     #     print(iter)
     #     iter = cur.next()
-def less_than_price():
-    pass
+def less_than_price(database, keyword, output_type):
+    curs = database.cursor()
+    iter = curs.first()#set_range(((12-len(str(keyword))) * ' ' + str(keyword)).encode("utf-8"))
+    res_set = set()
+
+    while iter:
+        if int((iter[0].strip()).decode("utf-8")) != keyword:
+            print(iter[0].strip())
+        else:
+            break
+        iter = curs.next()
+#======================================================================================================
+
+
+
 def less_than_date(database, keyword, output_type):
     curs = database.cursor()
     iter = curs.first()
