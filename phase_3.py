@@ -88,8 +88,9 @@ def main():
                 someset = greater_than_date(date_data, given_date)
             if '=' in operator:
                 equalset = search_equal(date_data, given_date, 'exact')
-            someset.union(equalset)
+            someset = someset.union(equalset)
             print(len(someset))
+
         elif price_pattern.match(match_expression):
             given_price = int(re.search(priceQuery, match_expression).group(2))
 
@@ -111,7 +112,7 @@ def main():
         else:
             print("Invalid input")
 
-    new_set = search_equal(date_data, user, 'exact')
+    # new_set = search_equal(date_data, user, 'exact')
 
         # if first_exp == True:
         #     result_set = new_set
