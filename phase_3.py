@@ -94,6 +94,7 @@ def main():
         else:
             print("Invalid input")
 
+<<<<<<< HEAD
         # if first_exp == True:
         #     result_set = new_set
         #     first_exp = False
@@ -109,6 +110,90 @@ def main():
     # greater_than(date_data, given_date, None)
 
 def greater_than(database, keyword, output_type):
+=======
+
+        if first_exp == True:
+            result_set = new_set
+            first_exp = False
+        else:
+            result_set.intersection(new_set)
+            if len(result_set) == 0:
+                print("No results")
+                break;
+
+        #result_set.intersection(new_set)
+
+
+    new_set = search_equal(term_data, user, 'part')
+
+    # greater_than(date_data, given_date, None)
+
+    # result = date_data.get(user.encode("utf-8"))
+    # result = str(result)
+    # print(result)
+    # print(given_date)
+    #result = result[2:-1]
+    #result = result.split(",")
+    # greater_than_equal(date_data, given_date, None)
+    #print("id: " + result[0] + " title: " + result[1])
+
+    # greater_than_date(date_data, given_date, None)
+    #testset = less_than_date(date_data, given_date, None)
+    #search_equal(term_data, user)
+    #print(len(testset))
+    # print(result[0:])
+    less_than_price(price_data, given_price, None)
+    # print(str(result[0].decode("utf-8")), result[1], result[2])
+
+    # if testString == 'output=full':
+    #     briefOutput = False
+    #
+    # exp = []  # all inputs by the user
+
+    # iter = cur.next()
+    # while iter:
+    #     print(iter)
+    #     iter = cur.next()
+    # for match in re.finditer(expression, user):
+    #     print(match.group(0))
+    #     exp.append(match.group(0))
+    #
+    # iter = cur.first()
+    # while iter:
+    #     print(iter)
+    #     iter = cur.next()
+def less_than_price(database, keyword, output_type):
+    curs = database.cursor()
+    iter = curs.first()#set_range(((12-len(str(keyword))) * ' ' + str(keyword)).encode("utf-8"))
+    res_set = set()
+
+    while iter:
+        if int((iter[0].strip()).decode("utf-8")) != keyword:
+            print(iter[0].strip())
+        else:
+            break
+        iter = curs.next()
+#======================================================================================================
+
+
+
+def less_than_date(database, keyword, output_type):
+    curs = database.cursor()
+    iter = curs.first()
+    res_set = set()
+    while iter:
+        if iter[0].decode("utf-8") != keyword:
+            result = iter[1].decode("utf-8").split(',')
+            result = result[0]
+            res_set.add(result)
+        else:
+            break
+        iter = curs.next()
+    return res_set
+
+def greater_than_date(database, keyword, output_type):
+
+>>>>>>> 47bd1bc562ff56560e6375244baf391471108bc3
     curs = database.cursor()
     iter = curs.set_range(keyword.encode("utf-8"))
     res_set = set()
