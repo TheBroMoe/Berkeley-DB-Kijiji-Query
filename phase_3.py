@@ -83,7 +83,7 @@ def main():
             someset = set()
             equalset = set()
             if '<' in operator:
-                someset = less_then_date(date_data, given_date)
+                someset = less_than_date(date_data, given_date)
             if '>' in operator:
                 someset = greater_than_date(date_data, given_date)
             if '=' in operator:
@@ -93,6 +93,18 @@ def main():
 
         elif price_pattern.match(match_expression):
             given_price = int(re.search(priceQuery, match_expression).group(2))
+            operator = (re.search(priceQuery, match_expression).group(1))
+            someset = set()
+            equalset = set()
+            if '<' in operator:
+                someset = less_than_price(price_data, given_price)
+            if '>' in operator:
+                someset = greater_than_price(price_data, given_price)
+            if '=' in operator:
+                equalset = search_equal_price(price_data, given_price)
+            someset = someset.union(equalset)
+            print(len(someset))
+
 
         elif location_pattern.match(match_expression):
             print("location match: " + match_expression)
@@ -111,20 +123,6 @@ def main():
 
         else:
             print("Invalid input")
-
-    new_set = search_equal(date_data, user, 'exact')
-
-        # if first_exp == True:
-        #     result_set = new_set
-        #     first_exp = False
-        # else:
-        #     result_set.intersection(new_set)
-        #     if len(result_set) == 0:
-        #         print("No results")
-        #         break;
-
-    #new_set = search_loc_cat(ad_data, user, 'cat')
-    # new_set = search_equal(term_data, user, 'part')
 
 def greater_than(database, keyword, output_type):
 
@@ -149,7 +147,7 @@ def print_out(database, results, option):
     pass
 
 #======================================================================================================#
-def less_than_price(database, keyword, output_type):
+def less_than_price(database, keyword):
     curs = database.cursor()
     iter = curs.first()
     res_set = set()
@@ -210,7 +208,6 @@ def greater_than_price(database, keyword):
 #======================================================================================================
 def search_loc_cat(database, keyword, type):
     res_set = set()
-    keyword = keyword.lower()
     cursor = database.cursor()
     k = cursor.first()
     while k:
@@ -235,16 +232,18 @@ def search_equal(database, keyword, type):
     # keyword is the key to look for in database
     # type is a string: 'exact' or 'part'
     searched = set()
-    keyword = keyword.lower()
     cursor = database.cursor()
     k = cursor.first()
 
     while k:
         key = k[0].decode("utf-8")
+        print(key)
         value = k[1].decode("utf-8")
+
         value = value.split(",")[0]
+        print(value)
         if type == 'exact':
-            if key == keyword.lower():
+            if key == keyword:
                 searched.add(value)
         elif type == 'part':
             if key.startswith(keyword):
@@ -258,6 +257,25 @@ def search_equal(database, keyword, type):
 
     return searched
 
+
+#======================================================================================================#
+def search_equal_price(database, keyword):
+    # database is the database to iterate over
+    # keyword is the key to look for in database
+    searched = set()
+    cursor = database.cursor()
+    k = cursor.set(((12-len(str(keyword))) * ' ' + str(keyword)).encode("utf-8"))
+
+    while k:
+        key = k[0].decode("utf-8").strip()
+
+        value = k[1].decode("utf-8")
+        value = value.split(",")[0]
+        if int(key) == keyword:
+            searched.add(value)
+        k = cursor.next()
+
+    return searched
 
 if __name__ == "__main__":
     main()
