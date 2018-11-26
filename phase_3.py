@@ -60,6 +60,11 @@ def main():
         # end program
         if user == "QUIT":
             print("Goodbye :)")
+            # close databases
+            date_data.close()
+            price_data.close()
+            term_data.close()
+            ad_data.close()
             return
 
         user = user.lower()
@@ -124,13 +129,13 @@ def main():
             else:
                 print("Invalid input")
 
-            # if it is the first expression, make it result set
+            # if it is the first expression, make it the result set
             if first_exp == True:
                 result_set = new_set
                 first_exp = False
             else:
                 # intersect new_set of ids with result_set to get ads
-                # that adhere to all given expressions
+                #   that adhere to all given expressions
                 result_set = result_set.intersection(new_set)
 
             # if result_set is empty after second expression, there are no results
@@ -209,7 +214,9 @@ def less_than_price(database, keyword):
             res_set.add(result)
         else:
             break
+
         iter = curs.next()
+
     return res_set
 #======================================================================================================#
 def less_than_date(database, keyword):
@@ -219,6 +226,7 @@ def less_than_date(database, keyword):
     curs = database.cursor()
     iter = curs.first()
     res_set = set()
+
     while iter:
         if iter[0].decode("utf-8") != keyword:
             result = iter[1].decode("utf-8").split(',')
@@ -226,7 +234,9 @@ def less_than_date(database, keyword):
             res_set.add(result)
         else:
             break
+
         iter = curs.next()
+
     return res_set
 #======================================================================================================
 def greater_than_date(database, keyword):
@@ -236,11 +246,13 @@ def greater_than_date(database, keyword):
     curs = database.cursor()
     iter = curs.set_range(keyword.encode("utf-8"))
     res_set = set()
+
     while iter:
         if iter[0].decode("utf-8") != keyword:
             result = iter[1].decode("utf-8").split(',')
             result = result[0]
             res_set.add(result)
+
         iter = curs.next()
 
     return res_set
@@ -253,6 +265,7 @@ def greater_than_price(database, keyword):
     keyword += 1
     iter = curs.set_range(((12-len(str(keyword))) * ' ' + str(keyword)).encode("utf-8"))
     res_set = set()
+
     while iter:
         if int((iter[0].strip()).decode("utf-8")) != keyword:
             result = iter[1].decode("utf-8").split(',')
@@ -260,7 +273,9 @@ def greater_than_price(database, keyword):
             res_set.add(result)
         else:
             break
+
         iter = curs.next()
+
     return res_set
 #======================================================================================================#
 def search_loc_cat(database, keyword, type):
@@ -271,6 +286,7 @@ def search_loc_cat(database, keyword, type):
     res_set = set()
     cursor = database.cursor()
     k = cursor.first()
+
     while k:
         if type == 'location':
             location = re.search("(<loc>)(.*)(</loc>)", k[1].decode("utf-8")).group(2)
@@ -281,7 +297,9 @@ def search_loc_cat(database, keyword, type):
             category = re.search("(<cat>)(.*)(</cat>)", k[1].decode("utf-8")).group(2)
             if category.lower() == keyword:
                 res_set.add(k[0].decode("utf-8"))
+
         k = cursor.next()
+
     return res_set
 #======================================================================================================#
 def search_date_term(database, keyword, type):
@@ -301,9 +319,11 @@ def search_date_term(database, keyword, type):
         if type == 'exact':
             if key == keyword:
                 res_set.add(value)
+
         elif type == 'part':
             if key.startswith(keyword):
                 res_set.add(value)
+
         k = cursor.next()
 
     return res_set
@@ -323,9 +343,11 @@ def search_equal_price(database, keyword):
         value = value.split(",")[0]
         if int(key) == keyword:
             res_set.add(value)
+
         k = cursor.next()
 
     return res_set
+
 
 if __name__ == "__main__":
     main()
