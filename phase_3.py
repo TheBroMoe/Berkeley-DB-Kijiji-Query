@@ -97,7 +97,8 @@ def main():
 
     #print("id: " + result[0] + " title: " + result[1])
 
-    search_equal(date_data, user, None)
+    search_equal(term_data, user, 'exact_term')
+
     # print(result[0:])
 
     # print(str(result[0].decode("utf-8")), result[1], result[2])
@@ -120,16 +121,53 @@ def main():
     #     print(iter)
     #     iter = cur.next()
 
-def search_equal(database, keyword, output_type):
-    # searched = set()
+def search_equal(database, keyword, type):
+    # database is the database to iterate over
+    # keyword is the key to look for in database
+    # type is a string: 'date', 'price', 'exact_term', 'part_term'
+    searched = set()
     print("***************************************")
 
+    print(keyword)
     cursor = database.cursor()
-    key = cursor.first()
-    while key:
-        # key = str(key)[2:-1]
-        print(key.())
-        key = cursor.next()
+    k = cursor.first()
+
+    if type == 'date':
+        while k:
+            print(k) #test
+            key = str(k[0])
+            key = key[2:-1]
+            print(key) #test
+            value = str(k[1])
+            value = value.split(",")[0][2:]
+            print(value) #test
+            if key == keyword:
+                searched.add(value)
+            k = cursor.next()
+
+    elif type == 'price':
+        while k:
+            print(k) #test
+
+    elif type == 'exact_term':
+        while k:
+            # print(k) #test
+            key = str(k[0])
+            key = key[2:-1]
+            # print(key) #test
+            value = str(k[1])
+            value = value.split(",")[0][2:]
+            if key == keyword:
+                searched.add(value)
+
+            k = cursor.next()
+
+
+    if len(searched) == 0:
+        print("No elements in searched set")
+    else:
+        print(searched)
+    # print(searched.key())
 
 
     # for n in database.keys():
