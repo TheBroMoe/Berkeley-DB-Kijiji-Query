@@ -1,3 +1,14 @@
+"""
+TODO LIST:
+* Add Comments to main function
+* Add Comments to helper functions
+* Add description for each function
+* Finish design pdf
+
+OPTIONAL TODOS:
+* Deal with edge cases
+"""
+
 from bsddb3 import db
 import re
 
@@ -22,6 +33,185 @@ termQuery = "(" + term + termSuffix + "|" + term + ")"
 output = "(output)(\s*)(=)(\s*)(" + alphanumeric + "+)"
 expression = dateQuery + "|" + priceQuery + "|" + locationQuery + "|" + catQuery + "|" + output + "|" + termQuery
 
+# FUNCTIONS #
+#======================================================================================================#
+def search_loc_cat(database, keyword, type):
+    res_set = set()
+    cursor = database.cursor()
+    k = cursor.first()
+    while k:
+        if type == 'location':
+            location = re.search("(<loc>)(.*)(</loc>)", k[1].decode("utf-8")).group(2)
+            if location.lower() == keyword:
+                res_set.add(k[0].decode("utf-8"))
+
+        elif type == 'cat':
+            category = re.search("(<cat>)(.*)(</cat>)", k[1].decode("utf-8")).group(2)
+            if category.lower() == keyword:
+                res_set.add(k[0].decode("utf-8"))
+        k = cursor.next()
+    return res_set
+
+#======================================================================================================#
+def less_than_price(database, keyword):
+    curs = database.cursor()
+    iter = curs.first()
+    res_set = set()
+
+    while iter:
+        if int((iter[0].strip()).decode("utf-8")) != keyword:
+            result = iter[1].decode("utf-8").split(',')
+            result = result[0]
+            res_set.add(result)
+        else:
+            break
+        iter = curs.next()
+    return res_set
+#======================================================================================================#
+
+def less_than_date(database, keyword):
+    curs = database.cursor()
+    iter = curs.first()
+    res_set = set()
+    while iter:
+        if iter[0].decode("utf-8") != keyword:
+            result = iter[1].decode("utf-8").split(',')
+            result = result[0]
+            res_set.add(result)
+        else:
+            break
+        iter = curs.next()
+    return res_set
+#======================================================================================================#
+def greater_than_date(database, keyword):
+
+    curs = database.cursor()
+    iter = curs.set_range(keyword.encode("utf-8"))
+    res_set = set()
+    while iter:
+        if iter[0].decode("utf-8") != keyword:
+            result = iter[1].decode("utf-8").split(',')
+            result = result[0]
+            res_set.add(result)
+        iter = curs.next()
+
+    return res_set
+
+#======================================================================================================#
+def greater_than_price(database, keyword):
+    curs = database.cursor()
+    keyword += 1
+    iter = curs.set_range(((12-len(str(keyword))) * ' ' + str(keyword)).encode("utf-8"))
+    res_set = set()
+    while iter:
+        if int((iter[0].strip()).decode("utf-8")) != keyword:
+            result = iter[1].decode("utf-8").split(',')
+            result = result[0]
+            res_set.add(result)
+        else:
+            break
+        iter = curs.next()
+    return res_set
+
+#======================================================================================================#
+def search_equal(database, keyword, type):
+    # database is the database to iterate over
+    # keyword is the key to look for in database
+    # type is a string: 'exact' or 'part'
+    searched = set()
+    cursor = database.cursor()
+    k = cursor.first()
+
+    while k:
+        key = k[0].decode("utf-8")
+        value = k[1].decode("utf-8")
+
+        value = value.split(",")[0]
+        if type == 'exact':
+            if key == keyword:
+                searched.add(value)
+        elif type == 'part':
+            if key.startswith(keyword):
+                searched.add(value)
+        k = cursor.next()
+
+    return searched
+
+#======================================================================================================#
+def search_equal_price(database, keyword):
+    # database is the database to iterate over
+    # keyword is the key to look for in database
+    searched = set()
+    cursor = database.cursor()
+    k = cursor.set(((12-len(str(keyword))) * ' ' + str(keyword)).encode("utf-8"))
+
+    while k:
+        key = k[0].decode("utf-8").strip()
+
+        value = k[1].decode("utf-8")
+        value = value.split(",")[0]
+        if int(key) == keyword:
+            searched.add(value)
+        k = cursor.next()
+
+    return searched
+
+#======================================================================================================#
+def print_out(database, results, brief):
+    curs = database.cursor()
+    if brief:
+        for result in results:
+            print("-----------------")
+
+            iter = database.get(result.encode("utf-8"))
+            iteration = iter.decode("utf-8")
+
+            print("ID: {}".format(result))
+
+            term_ti = re.search("(<ti>)(.*)(</ti>)", iteration).group(2)
+            term_ti = re.sub("&amp;", " ", term_ti)
+            term_ti = re.sub("&.*?;", "", term_ti)
+            term_ti = re.sub("[^0-9a-zA-Z-_]", " ", term_ti)
+
+            print("Title: {}".format(term_ti))
+
+    else:
+        for result in results:
+            print("-----------------")
+
+            iter = database.get(result.encode("utf-8"))
+            iteration = iter.decode("utf-8")
+
+            print("ID: {}".format(result))
+
+            date = re.search("(<date>)(.*)(</date>)", iteration).group(2)
+            print("Date: {}".format(date))
+
+            location = re.search("(<loc>)(.*)(</loc>)", iteration).group(2)
+            print("Location: {}".format(location))
+
+            category = re.search("(<cat>)(.*)(</cat>)", iteration).group(2)
+            print("Category: {}".format(category))
+
+            term_ti = re.search("(<ti>)(.*)(</ti>)", iteration).group(2)
+            term_ti = re.sub("&amp;", " ", term_ti)
+            term_ti = re.sub("&.*?;", "", term_ti)
+            term_ti = re.sub("[^0-9a-zA-Z-_]", " ", term_ti)
+            print("Title: {}".format(term_ti))
+
+            term_desc = re.search("(<desc>)(.*)(</desc>)", iteration).group(2).lower()
+            term_desc = re.sub("(&quot)|(&apos)|(&amp);", " ", term_desc)
+            term_desc = re.sub("&.*?;", "", term_desc)
+            term_desc = re.sub("[^0-9a-zA-Z-_]", " ", term_desc)
+            print("Description: {}".format(term_desc))
+
+            price = re.search("(<price>)(.*)(</price>)", iteration).group(2)
+            print("Price: {}".format(price))
+
+    print("-----------------")
+    print("Total Results: " + str(len(results)))
+
+# MAIN #
 
 def main():
     brief_output = False
