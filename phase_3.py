@@ -1,29 +1,5 @@
-'''
-alphanumeric    ::= [0-9a-zA-Z_-]
-numeric		    ::= [0-9]
-date            ::= numeric numeric numeric numeric '/' numeric numeric '/' numeric numeric
-datePrefix      ::= 'date' whitespace* ('=' | '>' | '<' | '>=' | '<=')
-dateQuery       ::= datePrefix whitespace* date
-price	      	::= numeric+
-pricePrefix     ::= 'price' whitespace* ('=' | '>' | '<' | '>=' | '<=')
-priceQuery  	::= pricePrefix whitespace* price
-location	    ::= alphanumeric+
-locationPrefix  ::= 'location' whitespace* '='
-locationQuery	::= locationPrefix whitespace* location
-cat	        	::= alphanumeric+
-catPrefix   	::= 'cat' whitespace* '='
-catQuery	    ::= catPrefix whitespace* cat
-term            ::= alphanumeric+
-termSuffix      ::= '%'
-termQuery       ::= term | term termSuffix
-expression      ::= dateQuery | priceQuery | locationQuery | catQuery | termQuery
-query           ::= expression (whitespace expression)*
-
-'''
 from bsddb3 import db
-
 import re
-
 
 alphanumeric = "[0-9a-zA-Z._-]"
 numeric = "[0-9]"
@@ -109,10 +85,10 @@ def main():
 
         elif location_pattern.match(match_expression):
             given_loc = re.search(locationQuery, match_expression).group(3)
-            search_loc_cat(ad_data, given_loc, 'location')
+            someset = search_loc_cat(ad_data, given_loc, 'location')
         elif cat_pattern.match(match_expression):
             given_cat = re.search(catQuery, match_expression).group(3)
-            search_loc_cat(ad_data, given_cat, 'cat')
+            someset = search_loc_cat(ad_data, given_cat, 'cat')
         elif output_pattern.match(match_expression):
             option = re.search(output, match_expression).group(5)
             if option == "full":
@@ -122,23 +98,22 @@ def main():
                 brief_output = True
                 print("brief_output is True")
         elif term_pattern.match(match_expression):
-            print("term match: " + match_expression)
+            given_term = re.search(termQuery, match_expression).group(0)
+            type = "part" if given_term[-1] == "%" else "exact"
+            if given_term[-1] == "%":
+                given_term = given_term[:-1]
+            someset = search_equal(term_data,given_term, type)
 
         else:
             print("Invalid input")
-    # new_set = search_equal(date_data, user, 'exact')
 
-        # if first_exp == True:
-        #     result_set = new_set
-        #     first_exp = False
-        # else:
-        #     result_set.intersection(new_set)
-        #     if len(result_set) == 0:
-        #         print("No results")
-        #         break;
-
-    #new_set = search_loc_cat(ad_data, user, 'cat')
-    # new_set = search_equal(term_data, user, 'part')
+        if first_exp == True:
+            result_set = someset
+            first_exp = False
+        else:
+            result_set.intersection(someset)
+            if len(result_set) == 0:
+                print("No results")
 
 def print_out(database, results, brief):
     curs = database.cursor()
@@ -190,28 +165,6 @@ def print_out(database, results, brief):
 
             price = re.search("(<price>)(.*)(</price>)", iteration).group(2)
             print("Price: {}".format(price))
-
-
-
-
-def greater_than(database, keyword, output_type):
-
-        if first_exp == True:
-            result_set = new_set
-            first_exp = False
-        else:
-            result_set.intersection(new_set)
-            if len(result_set) == 0:
-                print("No results")
-
-
-        #result_set.intersection(new_set)
-
-
-
-    # testset = greater_than_price(price_data, given_price, None)
-    # # testset = less_than_price(price_data, given_price, None)
-    # print(testset)
 
 #======================================================================================================#
 def less_than_price(database, keyword):
@@ -301,11 +254,9 @@ def search_equal(database, keyword, type):
 
     while k:
         key = k[0].decode("utf-8")
-        print(key)
         value = k[1].decode("utf-8")
 
         value = value.split(",")[0]
-        print(value)
         if type == 'exact':
             if key == keyword:
                 searched.add(value)
@@ -314,14 +265,7 @@ def search_equal(database, keyword, type):
                 searched.add(value)
         k = cursor.next()
 
-    if len(searched) == 0:
-        print("No elements in searched set")
-    else:
-        print(searched)
-
     return searched
-
-
 #======================================================================================================#
 def search_equal_price(database, keyword):
     # database is the database to iterate over
