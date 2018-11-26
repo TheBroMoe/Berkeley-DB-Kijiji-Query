@@ -149,7 +149,6 @@ def main():
 # FUNCTIONS #
 
 def print_out(database, results, brief):
-    print(results)
     # database is the database to look at (ad_data)
     # results is the set of ids for ads that match search
     # brief is True if the output is brief and False if output is full
@@ -165,15 +164,8 @@ def print_out(database, results, brief):
     # print the results in readable format
     for result in results:
         print("-----------------") # seperate results
-        print(result)
-        result = result.encode("utf-8")
-        print(result)
-        iter = database.get(result)
 
-        print("ITER START")
-        print(iter)
-        print("ITER END")
-
+        iter = database.get(result.encode("utf-8"))
         iteration = iter.decode("utf-8")
 
         print("ID: {}".format(result))
