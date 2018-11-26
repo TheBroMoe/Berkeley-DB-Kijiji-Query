@@ -1,6 +1,7 @@
 from bsddb3 import db
 import re
 
+# create patterns using regx
 alphanumeric = "[0-9a-zA-Z._-]"
 numeric = "[0-9]"
 date = "(" + numeric * 4 + "/" + numeric * 2 + "/" + numeric * 2 + ")"
@@ -25,6 +26,7 @@ expression = dateQuery + "|" + priceQuery + "|" + locationQuery + "|" + catQuery
 def main():
     brief_output = False
 
+    # create databases from idx files
     date_data = db.DB()
     price_data = db.DB()
     term_data = db.DB()
@@ -39,6 +41,7 @@ def main():
     ad_data.open(dbfile, None, db.DB_HASH, db.DB_RDONLY)
     cur = date_data.cursor()
 
+    # create patterns for inputs
     date_pattern = re.compile(dateQuery)
     price_pattern = re.compile(priceQuery)
     location_pattern = re.compile(locationQuery)
@@ -47,31 +50,32 @@ def main():
     output_pattern = re.compile(output)
 
     while True:
-        print("=====================")
-        user = input("Enter stuff (ENTER QUIT TO EXIT): ")
+        print("\n===============================================================")
+        user = input("Search (enter QUIT to exit): ")
 
+        # end program
         if user == "QUIT":
             print("Goodbye :)")
             return
 
         user = user.lower()
+        result_set = set() # set of (result) ids
 
-        result_set = set()
-
+        # determine if program is looking at first user input expression
         first_exp = True
 
+        # go through every given expression
         for match in re.finditer(expression, user):
             match_expression = match.group(0)
             if output_pattern.match(match_expression):
                 option = re.search(output, match_expression).group(5)
                 if option == "full":
                     brief_output = False
-                    print("brief_output is False")
                     continue
                 elif option == "brief":
                     brief_output = True
-                    print("brief_output is True")
                     continue
+
             elif date_pattern.match(match_expression):
                 given_date = re.search(dateQuery, match_expression).group(5)
                 operator = re.search(dateQuery, match_expression).group(3)
@@ -84,7 +88,6 @@ def main():
                 if '=' in operator:
                     equalset = search_equal(date_data, given_date, 'exact')
                 someset = someset.union(equalset)
-
 
             elif price_pattern.match(match_expression):
                 given_price = int(re.search(priceQuery, match_expression).group(2))
@@ -99,7 +102,6 @@ def main():
                     equalset = search_equal_price(price_data, given_price)
                 someset = someset.union(equalset)
 
-
             elif location_pattern.match(match_expression):
                 given_loc = re.search(locationQuery, match_expression).group(3)
                 someset = search_loc_cat(ad_data, given_loc, 'location')
@@ -112,10 +114,8 @@ def main():
                 option = re.search(output, match_expression).group(5)
                 if option == "full":
                     brief_output = False
-                    print("brief_output is False")
                 elif option == "brief":
                     brief_output = True
-                    print("brief_output is True")
 
             elif term_pattern.match(match_expression):
                 given_term = re.search(termQuery, match_expression).group(0)
@@ -127,19 +127,25 @@ def main():
             else:
                 print("Invalid input")
 
-
-            print(first_exp)
+            # if it is the first expression, make it result set
             if first_exp == True:
                 result_set = someset
                 first_exp = False
             else:
                 result_set = result_set.intersection(someset)
 
+            # if result_set is empty after second expression, there are no results
+            if len(result_set) == 0:
+                break
+
         print_out(ad_data, result_set, brief_output)
 
 
 def print_out(database, results, brief):
     curs = database.cursor()
+    if len(result_set) == 0:
+        print("No results")
+        return
     if brief:
         for result in results:
             print("-----------------")
@@ -182,7 +188,7 @@ def print_out(database, results, brief):
 
             term_desc = re.search("(<desc>)(.*)(</desc>)", iteration).group(2).lower()
             term_desc = re.sub("(&quot)|(&apos)|(&amp);", " ", term_desc)
-            term_desc = re.sub("&.*?;", "", term_desc)
+            term_desc = re.sub("&.*?;", " ", term_desc)
             term_desc = re.sub("[^0-9a-zA-Z-_]", " ", term_desc)
             print("Description: {}".format(term_desc))
 
@@ -208,7 +214,7 @@ def less_than_price(database, keyword):
             break
         iter = curs.next()
     return res_set
-#======================================================================================================
+#======================================================================================================#
 
 def less_than_date(database, keyword):
     curs = database.cursor()
@@ -223,7 +229,7 @@ def less_than_date(database, keyword):
             break
         iter = curs.next()
     return res_set
-#======================================================================================================
+#======================================================================================================#
 def greater_than_date(database, keyword):
 
     curs = database.cursor()
@@ -237,7 +243,7 @@ def greater_than_date(database, keyword):
         iter = curs.next()
 
     return res_set
-#======================================================================================================
+#======================================================================================================#
 def greater_than_price(database, keyword):
     curs = database.cursor()
     keyword += 1
@@ -252,7 +258,7 @@ def greater_than_price(database, keyword):
             break
         iter = curs.next()
     return res_set
-#======================================================================================================
+#======================================================================================================#
 def search_loc_cat(database, keyword, type):
     res_set = set()
     cursor = database.cursor()
