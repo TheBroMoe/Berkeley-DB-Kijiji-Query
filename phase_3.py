@@ -44,8 +44,8 @@ catQuery = catPrefix + "\s*" + cat
 term = alphanumeric + "+"
 termSuffix = '%'
 termQuery = "(" + term + termSuffix + "|" + term + ")"
-expression = dateQuery + "|" + priceQuery + "|" + locationQuery + "|" + catQuery + "|" + termQuery
-
+output = "(output)(\s*)(=)(\s*)(" + alphanumeric + "+)"
+expression = dateQuery + "|" + priceQuery + "|" + locationQuery + "|" + catQuery + "|" + output + "|" + termQuery
 
 
 def main():
@@ -70,7 +70,7 @@ def main():
     location_pattern = re.compile(locationQuery)
     cat_pattern = re.compile(catQuery)
     term_pattern = re.compile(termQuery)
-
+    output_pattern = re.compile(output)
     result_set = set()
 
     first_exp = True
@@ -97,8 +97,17 @@ def main():
             print("location match: " + match_expression)
         elif cat_pattern.match(match_expression):
             print("category match: " + match_expression)
+        elif output_pattern.match(match_expression):
+            option = re.search(output, match_expression).group(5)
+            if option == "full":
+                briefOutput = False
+                print("briefOutput is False")
+            elif option == "brief":
+                briefOutput = True
+                print("briefOutput is True")
         elif term_pattern.match(match_expression):
             print("term match: " + match_expression)
+
         else:
             print("Invalid input")
 
@@ -131,6 +140,9 @@ def greater_than(database, keyword, output_type):
 
 #    new_set = search_equal(term_data, user, 'part')
 
+    # testset = greater_than_price(price_data, given_price, None)
+    # # testset = less_than_price(price_data, given_price, None)
+    # print(testset)
 
 
 #======================================================================================================
@@ -215,8 +227,7 @@ def search_loc_cat(database, keyword, type):
         print()
     print(res_set)
     return res_set
-
-
+#======================================================================================================#
 def search_equal(database, keyword, type):
     # database is the database to iterate over
     # keyword is the key to look for in database
