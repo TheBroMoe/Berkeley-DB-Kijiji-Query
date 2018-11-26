@@ -56,7 +56,7 @@ def main():
     term_data = db.DB()
     ad_data = db.DB()
     dbfile = "da.idx"
-    date_data.open(dbfile, None, db.DB_BTREE, db.DB_RDONLY)
+    date_data.open(dbfile, None, db.DB_BTREE, db.DB_RDONLY, db.DB_DUP)
     dbfile = "pr.idx"
     price_data.open(dbfile, None, db.DB_BTREE, db.DB_RDONLY)
     dbfile = "te.idx"
@@ -76,8 +76,8 @@ def main():
         match_expression = match.group(0)
         if date_pattern.match(match_expression):
             given_date = re.search(dateQuery, match_expression).group(5)
-            giv_date = re.search(dateQuery, match_expression).group(3)
-            print(giv_date)
+            operator = re.search(dateQuery, match_expression).group(3)
+
         elif price_pattern.match(match_expression):
             print("price match: " + match_expression)
         elif location_pattern.match(match_expression):
@@ -88,13 +88,13 @@ def main():
             print("term match: " + match_expression)
 
 
-    result = date_data.get(user.encode("utf-8"))
-    result = str(result)
-    print(result)
-
+    # result = date_data.get(user.encode("utf-8"))
+    # result = str(result)
+    # print(result)
+    print(given_date)
     #result = result[2:-1]
     #result = result.split(",")
-
+    greater_than_equal(date_data, given_date, None)
     #print("id: " + result[0] + " title: " + result[1])
 
     search_equal(term_data, user, 'exact_term')
@@ -120,6 +120,13 @@ def main():
     # while iter:
     #     print(iter)
     #     iter = cur.next()
+def greater_than_equal(database, keyword, output_type):
+    curs = database.cursor()
+    iter = curs.set(keyword.encode("utf-8"))
+    while iter:
+        print(iter)
+        iter = curs.next()
+
 
 def search_equal(database, keyword, type):
     # database is the database to iterate over
