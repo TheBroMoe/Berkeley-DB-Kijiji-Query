@@ -74,10 +74,12 @@ def main():
 
     result_set = set()
 
+    first_exp = True
+
     for match in re.finditer(expression, user):
         match_expression = match.group(0)
         if date_pattern.match(match_expression):
-            given_date = re.search(dateQuery, match_expression).group(5)
+            # given_date = re.search(dateQuery, match_expression).group(5)
             operator = re.search(dateQuery, match_expression).group(3)
             #given_date = operator + given_date
         elif price_pattern.match(match_expression):
@@ -92,44 +94,19 @@ def main():
         else:
             print("Invalid input")
 
-        result_set.intersection(new_set)
+        if first_exp == True:
+            result_set = new_set
+            first_exp = False
+        else:
+            result_set.intersection(new_set)
+            if len(result_set) == 0:
+                print("No results")
+                break;
 
     new_set = search_equal(term_data, user, 'part')
 
+    # greater_than(date_data, given_date, None)
 
-    # result = date_data.get(user.encode("utf-8"))
-    # result = str(result)
-    # print(result)
-    # print(given_date)
-    #result = result[2:-1]
-    #result = result.split(",")
-    # greater_than_equal(date_data, given_date, None)
-    #print("id: " + result[0] + " title: " + result[1])
-
-    greater_than(date_data, given_date, None)
-    #search_equal(term_data, user)
-
-    # print(result[0:])
-
-    # print(str(result[0].decode("utf-8")), result[1], result[2])
-
-    # if testString == 'output=full':
-    #     briefOutput = False
-    #
-    # exp = []  # all inputs by the user
-
-    # iter = cur.next()
-    # while iter:
-    #     print(iter)
-    #     iter = cur.next()
-    # for match in re.finditer(expression, user):
-    #     print(match.group(0))
-    #     exp.append(match.group(0))
-    #
-    # iter = cur.first()
-    # while iter:
-    #     print(iter)
-    #     iter = cur.next()
 def greater_than(database, keyword, output_type):
     curs = database.cursor()
     iter = curs.set_range(keyword.encode("utf-8"))
@@ -149,7 +126,6 @@ def greater_than_price(database, keyword, output_type):
         iter = curs.next()
 
 def search_equal(database, keyword, type):
->>>>>>> 56f1eadae811f2d9eb5cee5caa6840f2024e9b98
     # database is the database to iterate over
     # keyword is the key to look for in database
     # type is a string: 'exact' or 'part'
@@ -173,14 +149,15 @@ def search_equal(database, keyword, type):
             k = cursor.next()
 
     elif type == 'part':
+        keyword = keyword[:-1]
         while k:
-            # print(k) #test
+            print(k) #test
             key = str(k[0])
             key = key[2:-1]
-            # print(key)
+            print(key)
             value = str(k[1])
             value = value.split(",")[0][2:-1]
-            # print(keyword)
+            print(keyword)
             if key.startswith(keyword):
                 searched.add(value)
             k = cursor.next()
