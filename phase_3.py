@@ -76,7 +76,6 @@ def main():
             someset = someset.union(equalset)
 
 
-
         elif price_pattern.match(match_expression):
             given_price = int(re.search(priceQuery, match_expression).group(2))
             operator = (re.search(priceQuery, match_expression).group(1))
@@ -91,13 +90,22 @@ def main():
             someset = someset.union(equalset)
 
 
-
         elif location_pattern.match(match_expression):
             given_loc = re.search(locationQuery, match_expression).group(3)
             someset = search_loc_cat(ad_data, given_loc, 'location')
+
         elif cat_pattern.match(match_expression):
             given_cat = re.search(catQuery, match_expression).group(3)
             someset = search_loc_cat(ad_data, given_cat, 'cat')
+
+        elif output_pattern.match(match_expression):
+            option = re.search(output, match_expression).group(5)
+            if option == "full":
+                brief_output = False
+                print("brief_output is False")
+            elif option == "brief":
+                brief_output = True
+                print("brief_output is True")
 
         elif term_pattern.match(match_expression):
             given_term = re.search(termQuery, match_expression).group(0)
@@ -109,6 +117,7 @@ def main():
         else:
             print("Invalid input")
 
+        print(first_exp)
         if first_exp == True:
             result_set = someset
             first_exp = False
@@ -116,6 +125,9 @@ def main():
             result_set = result_set.intersection(someset)
 
     print_out(ad_data, result_set, brief_output)
+
+    print_out(ad_data, result_set, brief_output)
+
 
 def print_out(database, results, brief):
     curs = database.cursor()
@@ -168,8 +180,9 @@ def print_out(database, results, brief):
             price = re.search("(<price>)(.*)(</price>)", iteration).group(2)
             print("Price: {}".format(price))
 
-        print("-----------------")
-        print("Total results: ", len(results))
+    print("-----------------")
+    print("Total Results: " + str(len(results)))
+
 
 #======================================================================================================#
 def less_than_price(database, keyword):
