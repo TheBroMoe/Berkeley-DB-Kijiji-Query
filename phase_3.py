@@ -92,8 +92,10 @@ def main():
             option = re.search(output, match_expression).group(5)
             if option == "full":
                 briefOutput = False
+                print("briefOutput is False")
             elif option == "brief":
                 briefOutput = True
+                print("briefOutput is True")
         elif term_pattern.match(match_expression):
             print("term match: " + match_expression)
 
