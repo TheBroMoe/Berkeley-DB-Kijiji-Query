@@ -38,7 +38,6 @@ def main():
     dbfile = "ad.idx"
     ad_data.open(dbfile, None, db.DB_HASH, db.DB_RDONLY)
     cur = date_data.cursor()
-    user = input("Enter stuff: ").lower()
 
     date_pattern = re.compile(dateQuery)
     price_pattern = re.compile(priceQuery)
@@ -46,86 +45,97 @@ def main():
     cat_pattern = re.compile(catQuery)
     term_pattern = re.compile(termQuery)
     output_pattern = re.compile(output)
-    result_set = set()
 
-    first_exp = True
+    while True:
+        print("=====================")
+        user = input("Enter stuff (ENTER QUIT TO EXIT): ")
 
-    for match in re.finditer(expression, user):
-        match_expression = match.group(0)
-        if output_pattern.match(match_expression):
-            option = re.search(output, match_expression).group(5)
-            if option == "full":
-                brief_output = False
-                print("brief_output is False")
-                continue
-            elif option == "brief":
-                brief_output = True
-                print("brief_output is True")
-                continue
-        elif date_pattern.match(match_expression):
-            given_date = re.search(dateQuery, match_expression).group(5)
-            operator = re.search(dateQuery, match_expression).group(3)
-            someset = set()
-            equalset = set()
-            if '<' in operator:
-                someset = less_than_date(date_data, given_date)
-            if '>' in operator:
-                someset = greater_than_date(date_data, given_date)
-            if '=' in operator:
-                equalset = search_equal(date_data, given_date, 'exact')
-            someset = someset.union(equalset)
+        if user == "QUIT":
+            print("Goodbye :)")
+            return
 
+        user = user.lower()
 
-        elif price_pattern.match(match_expression):
-            given_price = int(re.search(priceQuery, match_expression).group(2))
-            operator = (re.search(priceQuery, match_expression).group(1))
-            someset = set()
-            equalset = set()
-            if '<' in operator:
-                someset = less_than_price(price_data, given_price)
-            if '>' in operator:
-                someset = greater_than_price(price_data, given_price)
-            if '=' in operator:
-                equalset = search_equal_price(price_data, given_price)
-            someset = someset.union(equalset)
+        result_set = set()
+
+        first_exp = True
+
+        for match in re.finditer(expression, user):
+            match_expression = match.group(0)
+            if output_pattern.match(match_expression):
+                option = re.search(output, match_expression).group(5)
+                if option == "full":
+                    brief_output = False
+                    print("brief_output is False")
+                    continue
+                elif option == "brief":
+                    brief_output = True
+                    print("brief_output is True")
+                    continue
+            elif date_pattern.match(match_expression):
+                given_date = re.search(dateQuery, match_expression).group(5)
+                operator = re.search(dateQuery, match_expression).group(3)
+                someset = set()
+                equalset = set()
+                if '<' in operator:
+                    someset = less_than_date(date_data, given_date)
+                if '>' in operator:
+                    someset = greater_than_date(date_data, given_date)
+                if '=' in operator:
+                    equalset = search_equal(date_data, given_date, 'exact')
+                someset = someset.union(equalset)
 
 
-        elif location_pattern.match(match_expression):
-            given_loc = re.search(locationQuery, match_expression).group(3)
-            someset = search_loc_cat(ad_data, given_loc, 'location')
-
-        elif cat_pattern.match(match_expression):
-            given_cat = re.search(catQuery, match_expression).group(3)
-            someset = search_loc_cat(ad_data, given_cat, 'cat')
-
-        elif output_pattern.match(match_expression):
-            option = re.search(output, match_expression).group(5)
-            if option == "full":
-                brief_output = False
-                print("brief_output is False")
-            elif option == "brief":
-                brief_output = True
-                print("brief_output is True")
-
-        elif term_pattern.match(match_expression):
-            given_term = re.search(termQuery, match_expression).group(0)
-            type = "part" if given_term[-1] == "%" else "exact"
-            if given_term[-1] == "%":
-                given_term = given_term[:-1]
-            someset = search_equal(term_data,given_term, type)
-
-        else:
-            print("Invalid input")
+            elif price_pattern.match(match_expression):
+                given_price = int(re.search(priceQuery, match_expression).group(2))
+                operator = (re.search(priceQuery, match_expression).group(1))
+                someset = set()
+                equalset = set()
+                if '<' in operator:
+                    someset = less_than_price(price_data, given_price)
+                if '>' in operator:
+                    someset = greater_than_price(price_data, given_price)
+                if '=' in operator:
+                    equalset = search_equal_price(price_data, given_price)
+                someset = someset.union(equalset)
 
 
-        print(first_exp)
-        if first_exp == True:
-            result_set = someset
-            first_exp = False
-        else:
-            result_set = result_set.intersection(someset)
+            elif location_pattern.match(match_expression):
+                given_loc = re.search(locationQuery, match_expression).group(3)
+                someset = search_loc_cat(ad_data, given_loc, 'location')
 
-    print_out(ad_data, result_set, brief_output)
+            elif cat_pattern.match(match_expression):
+                given_cat = re.search(catQuery, match_expression).group(3)
+                someset = search_loc_cat(ad_data, given_cat, 'cat')
+
+            elif output_pattern.match(match_expression):
+                option = re.search(output, match_expression).group(5)
+                if option == "full":
+                    brief_output = False
+                    print("brief_output is False")
+                elif option == "brief":
+                    brief_output = True
+                    print("brief_output is True")
+
+            elif term_pattern.match(match_expression):
+                given_term = re.search(termQuery, match_expression).group(0)
+                type = "part" if given_term[-1] == "%" else "exact"
+                if given_term[-1] == "%":
+                    given_term = given_term[:-1]
+                someset = search_equal(term_data,given_term, type)
+
+            else:
+                print("Invalid input")
+
+
+            print(first_exp)
+            if first_exp == True:
+                result_set = someset
+                first_exp = False
+            else:
+                result_set = result_set.intersection(someset)
+
+        print_out(ad_data, result_set, brief_output)
 
 
 def print_out(database, results, brief):
