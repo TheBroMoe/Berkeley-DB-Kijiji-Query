@@ -24,7 +24,7 @@ from bsddb3 import db
 
 import re
 
-briefOutput = True
+brief_output = True
 
 
 alphanumeric = "[0-9a-zA-Z_-]"
@@ -91,17 +91,18 @@ def main():
         elif output_pattern.match(match_expression):
             option = re.search(output, match_expression).group(5)
             if option == "full":
-                briefOutput = False
-                print("briefOutput is False")
+                brief_output = False
+                print("brief_output is False")
             elif option == "brief":
-                briefOutput = True
-                print("briefOutput is True")
+                brief_output = True
+                print("brief_output is True")
         elif term_pattern.match(match_expression):
             print("term match: " + match_expression)
 
         else:
             print("Invalid input")
 
+    new_set = search_equal(date_data, user, 'exact')
 
         # if first_exp == True:
         #     result_set = new_set
@@ -112,16 +113,20 @@ def main():
         #         print("No results")
         #         break;
 
+        # print_out(ad_data, result_set, brief_output)
+
         #result_set.intersection(new_set)
 
 
-#    new_set = search_equal(term_data, user, 'part')
 
     # testset = greater_than_price(price_data, given_price, None)
     # # testset = less_than_price(price_data, given_price, None)
     # print(testset)
 
+def print_out(database, results, option):
+    pass
 
+#======================================================================================================#
 def less_than_price(database, keyword, output_type):
     curs = database.cursor()
     iter = curs.first()
@@ -212,10 +217,9 @@ def search_equal(database, keyword, type):
     k = cursor.first()
 
     while k:
-        key = str(k[0])
-        key = key[2:-1]
-        value = str(k[1])
-        value = value.split(",")[0][2:-1]
+        key = k[0].decode("utf-8")
+        value = k[1].decode("utf-8")
+        value = value.split(",")[0]
         if type == 'exact':
             if key == keyword.lower():
                 searched.add(value)
