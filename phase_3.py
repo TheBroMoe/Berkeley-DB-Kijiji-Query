@@ -24,8 +24,6 @@ from bsddb3 import db
 
 import re
 
-brief_output = True
-
 
 alphanumeric = "[0-9a-zA-Z_-]"
 numeric = "[0-9]"
@@ -49,6 +47,7 @@ expression = dateQuery + "|" + priceQuery + "|" + locationQuery + "|" + catQuery
 
 
 def main():
+    brief_output = False
 
     date_data = db.DB()
     price_data = db.DB()
@@ -90,6 +89,8 @@ def main():
                 equalset = search_equal(date_data, given_date, 'exact')
             someset = someset.union(equalset)
             print(len(someset))
+            print_out(ad_data, someset, brief_output)
+
 
         elif price_pattern.match(match_expression):
             given_price = int(re.search(priceQuery, match_expression).group(2))
@@ -111,7 +112,6 @@ def main():
 
         else:
             print("Invalid input")
-
     # new_set = search_equal(date_data, user, 'exact')
 
         # if first_exp == True:
@@ -125,6 +125,60 @@ def main():
 
     #new_set = search_loc_cat(ad_data, user, 'cat')
     # new_set = search_equal(term_data, user, 'part')
+
+def print_out(database, results, brief):
+    curs = database.cursor()
+    if brief:
+        for result in results:
+            print("-----------------")
+
+            iter = database.get(result.encode("utf-8"))
+            iteration = iter.decode("utf-8")
+
+            print("ID: {}".format(result))
+
+            term_ti = re.search("(<ti>)(.*)(</ti>)", iteration).group(2)
+            term_ti = re.sub("&amp;", " ", term_ti)
+            term_ti = re.sub("&.*?;", "", term_ti)
+            term_ti = re.sub("[^0-9a-zA-Z-_]", " ", term_ti)
+
+            print("Title: {}".format(term_ti))
+
+    else:
+        for result in results:
+            print("-----------------")
+
+            iter = database.get(result.encode("utf-8"))
+            iteration = iter.decode("utf-8")
+
+            print("ID: {}".format(result))
+
+            date = re.search("(<date>)(.*)(</date>)", iteration).group(2)
+            print("Date: {}".format(date))
+
+            location = re.search("(<loc>)(.*)(</loc>)", iteration).group(2)
+            print("Location: {}".format(location))
+
+            category = re.search("(<cat>)(.*)(</cat>)", iteration).group(2)
+            print("Category: {}".format(category))
+
+            term_ti = re.search("(<ti>)(.*)(</ti>)", iteration).group(2)
+            term_ti = re.sub("&amp;", " ", term_ti)
+            term_ti = re.sub("&.*?;", "", term_ti)
+            term_ti = re.sub("[^0-9a-zA-Z-_]", " ", term_ti)
+            print("Title: {}".format(term_ti))
+
+            term_desc = re.search("(<desc>)(.*)(</desc>)", iteration).group(2).lower()
+            term_desc = re.sub("(&quot)|(&apos)|(&amp);", " ", term_desc)
+            term_desc = re.sub("&.*?;", "", term_desc)
+            term_desc = re.sub("[^0-9a-zA-Z-_]", " ", term_desc)
+            print("Description: {}".format(term_desc))
+
+            price = re.search("(<price>)(.*)(</price>)", iteration).group(2)
+            print("Price: {}".format(price))
+
+
+
 
 def greater_than(database, keyword, output_type):
 
@@ -144,9 +198,6 @@ def greater_than(database, keyword, output_type):
     # testset = greater_than_price(price_data, given_price, None)
     # # testset = less_than_price(price_data, given_price, None)
     # print(testset)
-
-def print_out(database, results, option):
-    pass
 
 #======================================================================================================#
 def less_than_price(database, keyword, output_type):
@@ -257,7 +308,6 @@ def search_equal(database, keyword, type):
         print(searched)
 
     return searched
-
 
 if __name__ == "__main__":
     main()
