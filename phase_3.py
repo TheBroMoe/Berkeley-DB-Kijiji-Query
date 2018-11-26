@@ -72,6 +72,8 @@ def main():
     cat_pattern = re.compile(catQuery)
     term_pattern = re.compile(termQuery)
 
+    result_set = set()
+
     for match in re.finditer(expression, user):
         match_expression = match.group(0)
         if date_pattern.match(match_expression):
@@ -87,6 +89,12 @@ def main():
             print("category match: " + match_expression)
         elif term_pattern.match(match_expression):
             print("term match: " + match_expression)
+        else:
+            print("Invalid input")
+
+        result_set.intersection(new_set)
+
+    new_set = search_equal(term_data, user, 'part')
 
 
     # result = date_data.get(user.encode("utf-8"))
@@ -140,43 +148,49 @@ def greater_than_price(database, keyword, output_type):
         print(iter[0].strip())
         iter = curs.next()
 
-def search_equal(database, keyword):
+def search_equal(database, keyword, type):
+>>>>>>> 56f1eadae811f2d9eb5cee5caa6840f2024e9b98
     # database is the database to iterate over
     # keyword is the key to look for in database
-    # type is a string: 'date', 'price', 'exact_term', 'part_term'
+    # type is a string: 'exact' or 'part'
     searched = set()
     print("***************************************")
 
     print(keyword)
+    keyword = keyword.lower()
     cursor = database.cursor()
     k = cursor.first()
 
-    while k:
-        print(k) #test
-        key = str(k[0])
-        key = key[2:-1]
-        print(key) #test
-        value = str(k[1])
-        value = value.split(",")[0][2:-1]
-        # print(value) #test
-        if key == keyword:
-            searched.add(value)
-        k = cursor.next()
+    if type == 'exact':
+        while k:
+            # print(k) #test
+            key = str(k[0])
+            key = key[2:-1]
+            value = str(k[1])
+            value = value.split(",")[0][2:-1]
+            if key == keyword.lower():
+                searched.add(value)
+            k = cursor.next()
 
+    elif type == 'part':
+        while k:
+            # print(k) #test
+            key = str(k[0])
+            key = key[2:-1]
+            # print(key)
+            value = str(k[1])
+            value = value.split(",")[0][2:-1]
+            # print(keyword)
+            if key.startswith(keyword):
+                searched.add(value)
+            k = cursor.next()
 
     if len(searched) == 0:
         print("No elements in searched set")
     else:
         print(searched)
-    # print(searched.key())
 
-
-    # for n in database.keys():
-    #     n = str(n)
-    #     n = n[2:-1]
-    #     print(n)
-
-    # return searced
+    return searched
 
 
 if __name__ == "__main__":
