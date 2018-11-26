@@ -126,7 +126,7 @@ def search_equal(database, keyword, output_type):
     key = cursor.first()
     while key:
         # key = str(key)[2:-1]
-        print(key.key())
+        print(key.())
         key = cursor.next()
 
 
