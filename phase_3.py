@@ -77,7 +77,7 @@ def main():
         if date_pattern.match(match_expression):
             given_date = re.search(dateQuery, match_expression).group(5)
             operator = re.search(dateQuery, match_expression).group(3)
-
+            #given_date = operator + given_date
         elif price_pattern.match(match_expression):
             given_price = int(re.search(priceQuery, match_expression).group(2))
             print("price match: " + str(given_price))
@@ -97,8 +97,9 @@ def main():
     #result = result.split(",")
     # greater_than_equal(date_data, given_date, None)
     #print("id: " + result[0] + " title: " + result[1])
-    greater_than_price(price_data, given_price, None)
-    search_equal(term_data, user)
+
+    greater_than(date_data, given_date, None)
+    #search_equal(term_data, user)
 
     # print(result[0:])
 
@@ -123,25 +124,23 @@ def main():
     #     iter = cur.next()
 def greater_than(database, keyword, output_type):
     curs = database.cursor()
-    iter = curs.set(keyword.encode("utf-8"))
+    iter = curs.set_range(keyword.encode("utf-8"))
     while iter:
-        print(iter)
+        if iter[0].decode("utf-8") != keyword:
+            print(iter[0].decode("utf-8"))
         iter = curs.next()
 
     return None;
 def greater_than_price(database, keyword, output_type):
     curs = database.cursor()
-    iter = curs.set(((12-len(str(keyword))) * ' ' + str(keyword)).encode("utf-8"))
+    keyword += 1
+    iter = curs.set_range(((12-len(str(keyword))) * ' ' + str(keyword)).encode("utf-8"))
+
     while iter:
         print(iter[0].strip())
         iter = curs.next()
 
-<<<<<<< HEAD
-    return None;
-def search_equal(database, keyword, type):
-=======
 def search_equal(database, keyword):
->>>>>>> 534e5b5fb47a0f4b6038c272f3af3983200eab97
     # database is the database to iterate over
     # keyword is the key to look for in database
     # type is a string: 'date', 'price', 'exact_term', 'part_term'
