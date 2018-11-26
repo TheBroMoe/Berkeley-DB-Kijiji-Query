@@ -65,8 +65,6 @@ def main():
                 equalset = search_equal(date_data, given_date, 'exact')
             someset = someset.union(equalset)
             print(len(someset))
-            print_out(ad_data, someset, brief_output)
-
 
         elif price_pattern.match(match_expression):
             given_price = int(re.search(priceQuery, match_expression).group(2))
@@ -82,13 +80,14 @@ def main():
             someset = someset.union(equalset)
             print(len(someset))
 
-
         elif location_pattern.match(match_expression):
             given_loc = re.search(locationQuery, match_expression).group(3)
             someset = search_loc_cat(ad_data, given_loc, 'location')
+
         elif cat_pattern.match(match_expression):
             given_cat = re.search(catQuery, match_expression).group(3)
             someset = search_loc_cat(ad_data, given_cat, 'cat')
+
         elif output_pattern.match(match_expression):
             option = re.search(output, match_expression).group(5)
             if option == "full":
@@ -97,6 +96,7 @@ def main():
             elif option == "brief":
                 brief_output = True
                 print("brief_output is True")
+
         elif term_pattern.match(match_expression):
             given_term = re.search(termQuery, match_expression).group(0)
             type = "part" if given_term[-1] == "%" else "exact"
@@ -107,13 +107,17 @@ def main():
         else:
             print("Invalid input")
 
+        print(first_exp)
         if first_exp == True:
             result_set = someset
             first_exp = False
         else:
-            result_set.intersection(someset)
+            result_set = result_set.intersection(someset)
             if len(result_set) == 0:
                 print("No results")
+
+    print_out(ad_data, result_set, brief_output)
+
 
 def print_out(database, results, brief):
     curs = database.cursor()
@@ -165,6 +169,10 @@ def print_out(database, results, brief):
 
             price = re.search("(<price>)(.*)(</price>)", iteration).group(2)
             print("Price: {}".format(price))
+
+    print("-----------------")
+    print("Total Results: " + str(len(results)))
+
 
 #======================================================================================================#
 def less_than_price(database, keyword):
