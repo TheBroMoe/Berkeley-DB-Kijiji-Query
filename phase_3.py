@@ -91,13 +91,13 @@ def main():
     # result = date_data.get(user.encode("utf-8"))
     # result = str(result)
     # print(result)
-    print(given_date)
+    # print(given_date)
     #result = result[2:-1]
     #result = result.split(",")
-    greater_than_equal(date_data, given_date, None)
+    # greater_than_equal(date_data, given_date, None)
     #print("id: " + result[0] + " title: " + result[1])
 
-    search_equal(term_data, user, 'exact_term')
+    search_equal(term_data, user)
 
     # print(result[0:])
 
@@ -128,7 +128,7 @@ def greater_than_equal(database, keyword, output_type):
         iter = curs.next()
 
 
-def search_equal(database, keyword, type):
+def search_equal(database, keyword):
     # database is the database to iterate over
     # keyword is the key to look for in database
     # type is a string: 'date', 'price', 'exact_term', 'part_term'
@@ -139,35 +139,17 @@ def search_equal(database, keyword, type):
     cursor = database.cursor()
     k = cursor.first()
 
-    if type == 'date':
-        while k:
-            print(k) #test
-            key = str(k[0])
-            key = key[2:-1]
-            print(key) #test
-            value = str(k[1])
-            value = value.split(",")[0][2:]
-            print(value) #test
-            if key == keyword:
-                searched.add(value)
-            k = cursor.next()
-
-    elif type == 'price':
-        while k:
-            print(k) #test
-
-    elif type == 'exact_term':
-        while k:
-            # print(k) #test
-            key = str(k[0])
-            key = key[2:-1]
-            # print(key) #test
-            value = str(k[1])
-            value = value.split(",")[0][2:]
-            if key == keyword:
-                searched.add(value)
-
-            k = cursor.next()
+    while k:
+        print(k) #test
+        key = str(k[0])
+        key = key[2:-1]
+        print(key) #test
+        value = str(k[1])
+        value = value.split(",")[0][2:-1]
+        # print(value) #test
+        if key == keyword:
+            searched.add(value)
+        k = cursor.next()
 
 
     if len(searched) == 0:
