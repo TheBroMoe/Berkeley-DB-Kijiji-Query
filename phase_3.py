@@ -34,7 +34,7 @@ datePrefix = "(date)\s*(=|>|<|>=|<=)"
 dateQuery = "(" + datePrefix + ")(\s*)(" + date + ")"
 price = numeric + "+"
 pricePrefix = 'price\s*(=|>|<|>=|<=)'
-priceQuery = pricePrefix + "\s*" + price
+priceQuery = pricePrefix + "\s*" + "(" + price + ")"
 location = alphanumeric + '+'
 locationPrefix = 'location\s*='
 locationQuery = locationPrefix + '\s*' + location
@@ -56,7 +56,7 @@ def main():
     term_data = db.DB()
     ad_data = db.DB()
     dbfile = "da.idx"
-    date_data.open(dbfile, None, db.DB_BTREE, db.DB_RDONLY, db.DB_DUP)
+    date_data.open(dbfile, None, db.DB_BTREE, db.DB_RDONLY)
     dbfile = "pr.idx"
     price_data.open(dbfile, None, db.DB_BTREE, db.DB_RDONLY)
     dbfile = "te.idx"
@@ -79,7 +79,8 @@ def main():
             operator = re.search(dateQuery, match_expression).group(3)
 
         elif price_pattern.match(match_expression):
-            print("price match: " + match_expression)
+            given_price = int(re.search(priceQuery, match_expression).group(2))
+            print("price match: " + str(given_price))
         elif location_pattern.match(match_expression):
             print("location match: " + match_expression)
         elif cat_pattern.match(match_expression):
@@ -91,13 +92,13 @@ def main():
     # result = date_data.get(user.encode("utf-8"))
     # result = str(result)
     # print(result)
-    print(given_date)
+    #print(given_date)
     #result = result[2:-1]
     #result = result.split(",")
-    greater_than_equal(date_data, given_date, None)
+    greater_than_price(price_data, given_price, None)
     #print("id: " + result[0] + " title: " + result[1])
 
-    search_equal(term_data, user, 'exact_term')
+    #search_equal(term_data, user, 'exact_term')
 
     # print(result[0:])
 
@@ -120,14 +121,22 @@ def main():
     # while iter:
     #     print(iter)
     #     iter = cur.next()
-def greater_than_equal(database, keyword, output_type):
+def greater_than(database, keyword, output_type):
     curs = database.cursor()
     iter = curs.set(keyword.encode("utf-8"))
     while iter:
         print(iter)
         iter = curs.next()
 
+    return None;
+def greater_than_price(database, keyword, output_type):
+    curs = database.cursor()
+    iter = curs.set(((12-len(str(keyword))) * ' ' + str(keyword)).encode("utf-8"))
+    while iter:
+        print(iter[0].strip())
+        iter = curs.next()
 
+    return None;
 def search_equal(database, keyword, type):
     # database is the database to iterate over
     # keyword is the key to look for in database
