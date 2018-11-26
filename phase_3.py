@@ -45,12 +45,12 @@ term = alphanumeric + "+"
 termSuffix = '%'
 termQuery = "(" + term + termSuffix + "|" + term + ")"
 expression = dateQuery + "|" + priceQuery + "|" + locationQuery + "|" + catQuery + "|" + termQuery
-# query = "(?:(" + expression + ")\s?)+"
+
 
 
 def main():
 
-    # testString = input()
+
     date_data = db.DB()
     price_data = db.DB()
     term_data = db.DB()
@@ -79,12 +79,12 @@ def main():
     for match in re.finditer(expression, user):
         match_expression = match.group(0)
         if date_pattern.match(match_expression):
-            # given_date = re.search(dateQuery, match_expression).group(5)
+            given_date = re.search(dateQuery, match_expression).group(5)
             operator = re.search(dateQuery, match_expression).group(3)
             #given_date = operator + given_date
         elif price_pattern.match(match_expression):
             given_price = int(re.search(priceQuery, match_expression).group(2))
-            print("price match: " + str(given_price))
+
         elif location_pattern.match(match_expression):
             print("location match: " + match_expression)
         elif cat_pattern.match(match_expression):
@@ -94,68 +94,40 @@ def main():
         else:
             print("Invalid input")
 
-
-        if first_exp == True:
-            result_set = new_set
-            first_exp = False
-        else:
-            result_set.intersection(new_set)
-            if len(result_set) == 0:
-                print("No results")
-                break;
+        #
+        # if first_exp == True:
+        #     #result_set = new_set
+        #     first_exp = False
+        # else:
+        #     result_set.intersection(new_set)
+        #     if len(result_set) == 0:
+        #         print("No results")
+        #         break;
 
         #result_set.intersection(new_set)
 
 
-    new_set = search_equal(term_data, user, 'part')
+#    new_set = search_equal(term_data, user, 'part')
 
-    # greater_than(date_data, given_date, None)
 
-    # result = date_data.get(user.encode("utf-8"))
-    # result = str(result)
-    # print(result)
-    # print(given_date)
-    #result = result[2:-1]
-    #result = result.split(",")
-    # greater_than_equal(date_data, given_date, None)
-    #print("id: " + result[0] + " title: " + result[1])
 
-    # greater_than_date(date_data, given_date, None)
-    #testset = less_than_date(date_data, given_date, None)
-    #search_equal(term_data, user)
-    #print(len(testset))
-    # print(result[0:])
-    less_than_price(price_data, given_price, None)
-    # print(str(result[0].decode("utf-8")), result[1], result[2])
-
-    # if testString == 'output=full':
-    #     briefOutput = False
-    #
-    # exp = []  # all inputs by the user
-
-    # iter = cur.next()
-    # while iter:
-    #     print(iter)
-    #     iter = cur.next()
-    # for match in re.finditer(expression, user):
-    #     print(match.group(0))
-    #     exp.append(match.group(0))
-    #
-    # iter = cur.first()
-    # while iter:
-    #     print(iter)
-    #     iter = cur.next()
+    testset = greater_than_price(price_data, given_price, None)
+    # testset = less_than_price(price_data, given_price, None)
+    print(testset)
 def less_than_price(database, keyword, output_type):
     curs = database.cursor()
-    iter = curs.first()#set_range(((12-len(str(keyword))) * ' ' + str(keyword)).encode("utf-8"))
+    iter = curs.first()
     res_set = set()
 
     while iter:
         if int((iter[0].strip()).decode("utf-8")) != keyword:
-            print(iter[0].strip())
+            result = iter[1].decode("utf-8").split(',')
+            result = result[0]
+            res_set.add(result)
         else:
             break
         iter = curs.next()
+    return res_set
 #======================================================================================================
 
 
@@ -173,7 +145,7 @@ def less_than_date(database, keyword, output_type):
             break
         iter = curs.next()
     return res_set
-
+#======================================================================================================
 def greater_than_date(database, keyword, output_type):
 
     curs = database.cursor()
@@ -187,15 +159,23 @@ def greater_than_date(database, keyword, output_type):
         iter = curs.next()
 
     return res_set
+#======================================================================================================
 def greater_than_price(database, keyword, output_type):
     curs = database.cursor()
     keyword += 1
     iter = curs.set_range(((12-len(str(keyword))) * ' ' + str(keyword)).encode("utf-8"))
-
+    res_set = set()
     while iter:
-        print(iter[0].strip())
+        if int((iter[0].strip()).decode("utf-8")) != keyword:
+            print(iter)
+            result = iter[1].decode("utf-8").split(',')
+            result = result[0]
+            res_set.add(result)
+        else:
+            break
         iter = curs.next()
-
+    return res_set
+#*************************************************************************************
 def search_equal(database, keyword, type):
     # database is the database to iterate over
     # keyword is the key to look for in database
