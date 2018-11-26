@@ -92,7 +92,7 @@ def main():
         else:
             print("Invalid input")
 
-        result_set.intersection(new_set)
+        #result_set.intersection(new_set)
 
     new_set = search_equal(term_data, user, 'part')
 
@@ -106,9 +106,10 @@ def main():
     # greater_than_equal(date_data, given_date, None)
     #print("id: " + result[0] + " title: " + result[1])
 
-    greater_than(date_data, given_date, None)
+    # greater_than_date(date_data, given_date, None)
+    testset = less_than_date(date_data, given_date, None)
     #search_equal(term_data, user)
-
+    print(len(testset))
     # print(result[0:])
 
     # print(str(result[0].decode("utf-8")), result[1], result[2])
@@ -130,15 +131,34 @@ def main():
     # while iter:
     #     print(iter)
     #     iter = cur.next()
-def greater_than(database, keyword, output_type):
+def less_than_price():
+    pass
+def less_than_date(database, keyword, output_type):
     curs = database.cursor()
-    iter = curs.set_range(keyword.encode("utf-8"))
+    iter = curs.first()
+    res_set = set()
     while iter:
         if iter[0].decode("utf-8") != keyword:
-            print(iter[0].decode("utf-8"))
+            result = iter[1].decode("utf-8").split(',')
+            result = result[0]
+            res_set.add(result)
+        else:
+            break
+        iter = curs.next()
+    return res_set
+
+def greater_than_date(database, keyword, output_type):
+    curs = database.cursor()
+    iter = curs.set_range(keyword.encode("utf-8"))
+    res_set = set()
+    while iter:
+        if iter[0].decode("utf-8") != keyword:
+            result = iter[1].decode("utf-8").split(',')
+            result = result[0]
+            res_set.add(result)
         iter = curs.next()
 
-    return None;
+    return res_set
 def greater_than_price(database, keyword, output_type):
     curs = database.cursor()
     keyword += 1
@@ -149,7 +169,6 @@ def greater_than_price(database, keyword, output_type):
         iter = curs.next()
 
 def search_equal(database, keyword, type):
->>>>>>> 56f1eadae811f2d9eb5cee5caa6840f2024e9b98
     # database is the database to iterate over
     # keyword is the key to look for in database
     # type is a string: 'exact' or 'part'
