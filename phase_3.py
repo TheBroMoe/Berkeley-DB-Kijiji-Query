@@ -31,7 +31,7 @@ alphanumeric = "[0-9a-zA-Z_-]"
 numeric = "[0-9]"
 date = "(" + numeric * 4 + "/" + numeric * 2 + "/" + numeric * 2 + ")"
 datePrefix = "(date)\s*(=|>|<|>=|<=)"
-dateQuery = datePrefix + "\s*" + date
+dateQuery = "(" + datePrefix + ")(\s*)(" + date + ")"
 price = numeric + "+"
 pricePrefix = 'price\s*(=|>|<|>=|<=)'
 priceQuery = pricePrefix + "\s*" + price
@@ -56,14 +56,14 @@ def main():
     term_data = db.DB()
     ad_data = db.DB()
     dbfile = "da.idx"
-    datedata.open(dbfile, None, db.DB_BTREE, db.DB_RDONLY)
+    date_data.open(dbfile, None, db.DB_BTREE, db.DB_RDONLY)
     dbfile = "pr.idx"
-    pricedata.open(dbfile, None, db.DB_BTREE, db.DB_RDONLY)
+    price_data.open(dbfile, None, db.DB_BTREE, db.DB_RDONLY)
     dbfile = "te.idx"
-    termdata.open(dbfile, None, db.DB_BTREE, db.DB_RDONLY)
+    term_data.open(dbfile, None, db.DB_BTREE, db.DB_RDONLY)
     dbfile = "ad.idx"
-    addata.open(dbfile, None, db.DB_HASH, db.DB_RDONLY)
-    cur = datedata.cursor()
+    ad_data.open(dbfile, None, db.DB_HASH, db.DB_RDONLY)
+    cur = date_data.cursor()
     user = input("Enter stuff: ")
 
     date_pattern = re.compile(dateQuery)
@@ -75,7 +75,9 @@ def main():
     for match in re.finditer(expression, user):
         match_expression = match.group(0)
         if date_pattern.match(match_expression):
-            print("Date match: " + match_expression)
+            given_date = re.search(dateQuery, match_expression).group(5)
+            giv_date = re.search(dateQuery, match_expression).group(3)
+            print(giv_date)
         elif price_pattern.match(match_expression):
             print("price match: " + match_expression)
         elif location_pattern.match(match_expression):
@@ -84,7 +86,7 @@ def main():
             print("category match: " + match_expression)
         elif term_pattern.match(match_expression):
             print("term match: " + match_expression)
-        print("=======")
+
 
     result = date_data.get(user.encode("utf-8"))
     result = str(result)
@@ -95,7 +97,7 @@ def main():
 
     #print("id: " + result[0] + " title: " + result[1])
 
-    search_equal(cur, termdata, None)
+    search_equal(cur, term_data, None)
     # print(result[0:])
 
     # print(str(result[0].decode("utf-8")), result[1], result[2])
@@ -120,7 +122,7 @@ def main():
 
 def search_equal(cursor, database, output_type):
     # searched = set()
-
+    pass
     # key = database.firstkey()
 
 
