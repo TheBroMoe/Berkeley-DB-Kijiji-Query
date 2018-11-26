@@ -47,9 +47,7 @@ termQuery = "(" + term + termSuffix + "|" + term + ")"
 expression = dateQuery + "|" + priceQuery + "|" + locationQuery + "|" + catQuery + "|" + termQuery
 
 
-
 def main():
-
 
     date_data = db.DB()
     price_data = db.DB()
@@ -109,11 +107,11 @@ def main():
 
 #    new_set = search_equal(term_data, user, 'part')
 
-
-
     testset = greater_than_price(price_data, given_price, None)
     # testset = less_than_price(price_data, given_price, None)
     print(testset)
+
+
 def less_than_price(database, keyword, output_type):
     curs = database.cursor()
     iter = curs.first()
@@ -128,10 +126,7 @@ def less_than_price(database, keyword, output_type):
             break
         iter = curs.next()
     return res_set
-#======================================================================================================
-
-
-
+#======================================================================================================#
 def less_than_date(database, keyword, output_type):
     curs = database.cursor()
     iter = curs.first()
@@ -145,7 +140,7 @@ def less_than_date(database, keyword, output_type):
             break
         iter = curs.next()
     return res_set
-#======================================================================================================
+#======================================================================================================#
 def greater_than_date(database, keyword, output_type):
 
     curs = database.cursor()
@@ -159,7 +154,7 @@ def greater_than_date(database, keyword, output_type):
         iter = curs.next()
 
     return res_set
-#======================================================================================================
+#======================================================================================================#
 def greater_than_price(database, keyword, output_type):
     curs = database.cursor()
     keyword += 1
@@ -174,7 +169,7 @@ def greater_than_price(database, keyword, output_type):
         else:
             break
         iter = curs.next()
-
+#======================================================================================================#
 def search_loc_cat(database, keyword, type):
     res_set = set()
     keyword = keyword.lower()
@@ -196,8 +191,7 @@ def search_loc_cat(database, keyword, type):
         print()
     print(res_set)
     return res_set
-
-
+#======================================================================================================#
 def search_equal(database, keyword, type):
     # database is the database to iterate over
     # keyword is the key to look for in database
