@@ -238,7 +238,7 @@ def less_than_date(database, keyword):
         iter = curs.next()
 
     return res_set
-#======================================================================================================
+#======================================================================================================#
 def greater_than_date(database, keyword):
     # database is the database to be looked at
     # keyword is a string
