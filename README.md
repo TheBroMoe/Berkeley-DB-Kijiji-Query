@@ -1,2 +1,4 @@
 # project_2
-this is an excellent assignment
+A python program that uses a high-performance embedded database for Kijiji Listings
+
+Refer to Report.pdf for design details
